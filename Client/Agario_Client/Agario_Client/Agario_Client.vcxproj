@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClInclude Include="Agario_Client.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="PacketDefine.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
