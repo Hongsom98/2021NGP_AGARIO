@@ -2,8 +2,7 @@
 #pragma comment(lib, "ws2_32")
 #include <iostream>
 #include <WinSock2.h>
-#include <Windows.h>
-#include <stdlib.h>
+#include "framework.h"
 
 using namespace std;
 
@@ -69,7 +68,7 @@ int main()
     ZeroMemory(&serveraddr, sizeof(serveraddr));
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    serveraddr.sin_port = htons(SERVERPORT);
+    serveraddr.sin_port = htons(TCPPORT);
     retval = bind(listen_sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
     if (retval == SOCKET_ERROR) err_quit("bind()");
 

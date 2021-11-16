@@ -1,0 +1,11 @@
+﻿  MainServer.cpp
+C:\Users\한영인\Documents\GitHub\2021NGP_AGARIO\Server\Server\PacketDefine.h(49,13): error C3646: 'playerlist': 알 수 없는 재정의 지정자입니다.
+C:\Users\한영인\Documents\GitHub\2021NGP_AGARIO\Server\Server\PacketDefine.h(49,23): error C2143: 구문 오류: ','이(가) '[' 앞에 없습니다.
+C:\Users\한영인\Documents\GitHub\2021NGP_AGARIO\Server\Server\PacketDefine.h(49,26): error C2238: ';' 앞에 예기치 않은 토큰이 있습니다.
+C:\Users\한영인\Documents\GitHub\2021NGP_AGARIO\Server\Server\PacketDefine.h(58,7): error C2369: 'GameObjectListPacket::list': 재정의. 첨자가 다릅니다.
+C:\Users\한영인\Documents\GitHub\2021NGP_AGARIO\Server\Server\PacketDefine.h(57): message : 'GameObjectListPacket::list' 선언을 참조하십시오.
+C:\Users\한영인\Documents\GitHub\2021NGP_AGARIO\Server\Server\MainServer.cpp(71,33): error C2065: 'SERVERPORT': 선언되지 않은 식별자입니다.
+C:\Users\한영인\Documents\GitHub\2021NGP_AGARIO\Server\Server\MainServer.cpp(83,14): error C2065: 'BUFSIZE': 선언되지 않은 식별자입니다.
+C:\Users\한영인\Documents\GitHub\2021NGP_AGARIO\Server\Server\MainServer.cpp(87,32): error C2065: 'cs': 선언되지 않은 식별자입니다.
+C:\Users\한영인\Documents\GitHub\2021NGP_AGARIO\Server\Server\MainServer.cpp(97,41): error C2065: 'FileSendThread': 선언되지 않은 식별자입니다.
+C:\Users\한영인\Documents\GitHub\2021NGP_AGARIO\Server\Server\MainServer.cpp(101,28): error C2065: 'cs': 선언되지 않은 식별자입니다.
