@@ -42,7 +42,7 @@ struct PlayerListPacket
 {
 	char size;
 	char type;
-	PlayerInfo Playerlists;
+	PlayerInfo Playerlists[3];
 	char rank[3];
 };
 

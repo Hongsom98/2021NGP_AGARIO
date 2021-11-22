@@ -20,14 +20,14 @@ void SendID_OK(bool duplicated, SOCKET client_sock) {
     if (duplicated)
     {
         ClientLoginOKPacket packet;
-        packet.size = 1;
+        packet.size = sizeof(packet);
         packet.type = NICKNAME_USE;
         int retval = send(client_sock, (char*)&packet, sizeof(packet),0);
     }
     else
     {
         ClientLoginOKPacket packet;
-        packet.size = 1;
+        packet.size = sizeof(packet);
         packet.type = NICKNAME_UNUSE;
         int retval = send(client_sock, (char*)&packet, sizeof(packet), 0);
     }
@@ -45,7 +45,21 @@ bool CheckID(const char* ID)
     cout << "중복 없음" << endl << endl;
     return true;
 }
-
+void SendPlayerList(SOCKET client_sock)
+{
+    PlayerListPacket packet;
+    packet.type = PLAYERLIST;
+    
+    packet.size = sizeof(packet);
+    
+    for (int i = 0; i < nowID; ++i)
+    {
+        packet.Playerlists[i] = Player[i];
+        packet.rank[i] = Player[i].Score;
+    }
+    int retval = send(client_sock, (char*)&packet, sizeof(packet), 0);
+    
+}
 void err_quit(const char* msg)
 {
     LPVOID lpMsgBuf;
