@@ -5,29 +5,14 @@
 #define NICKNAME_UNUSE	12
 #define MAXUSER			13
 
-#define PLAYERLIST		110
-#define GAMEOBJECTLIST	111
-#define BOTLIST			112
-#define GAMEOVER		113
+#define GAMEOBJECTLIST	110
+#define INPUTDATA		111
+#define GAMEOVER		112
 
 struct Feed
 {
 	float Center;
 	float Radiuse;
-};
-struct Trap
-{
-	float Center;
-	float Radius;
-};
-struct GameObject
-{
-	float Center;
-	float Radius;
-};
-struct BOT
-{
-
 };
 
 struct ClientLoginPacket
@@ -43,27 +28,20 @@ struct ClientLoginOKPacket
 	char type;
 };
 
-struct PlayerListPacket
+struct GameObejctPacket
 {
 	char size;
 	char type;
 	PlayerInfo playerlist[3];
-	char rank[3];
+	Feed feedlist[MAXFEED];
 };
 
-struct GameObjectListPacket
+struct PlayerInputPacket
 {
 	char size;
 	char type;
-	Feed list[MAXFEED];
-	Trap list[MAXTRAP];
-};
-
-struct BOTLIST
-{
-	char size;
-	char type;
-	BOT botlist[MAXBOT];
+	POINT mousePos;
+	char keyState;
 };
 
 struct GameOverPacket

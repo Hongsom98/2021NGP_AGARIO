@@ -16,18 +16,20 @@
 #define TCPPORT			54321
 
 #define MAXFEED			300
-#define MAXTRAP			30
-#define MAXBOT			10
 
 #include "PacketDefine.h"
 
 
-
-struct PlayerInfo
+struct CObject
 {
 	POINT Center;
 	float Radius;
-	char nickname[12];
+};
+
+struct PlayerInfo
+{
+	CObject SellData[4];
+	char ID[12];
 	float Score;
 	COLORREF Color;
 };
