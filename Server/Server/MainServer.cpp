@@ -5,7 +5,8 @@
 #include "framework.h"
 
 using namespace std;
-
+PlayerInfo Player[3];
+int nowID{};
 void err_quit(const char* msg)
 {
     LPVOID lpMsgBuf;
@@ -51,6 +52,9 @@ int recvn(SOCKET s, char* buf, int len, int flags)
     return (len - left);
 }
 
+void SendID_OK(bool duplicated) {}
+
+
 int main()
 {
     int retval;
@@ -81,7 +85,7 @@ int main()
     SOCKET client_sock;
     SOCKADDR_IN clientaddr;
     int addrlen;
-    
+    char buf[256] = "";
     int len;
 
     HANDLE hThread;
@@ -94,12 +98,48 @@ int main()
             err_display((char*)"accept()");
             break;
         }
+
+        printf("\n[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n",
+            inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
+
+        do {
+            retval = recvn(client_sock, (char*)&len, sizeof(int), 0);
+            if (retval == SOCKET_ERROR) {
+                err_display("recv()");
+                break;
+            }
+            else if (retval == 0)
+                break;
+            char* bus = new char[len + 1];
+            // 데이터 받기(가변 길이)
+            retval = recvn(client_sock, buf, len, 0);
+            if (retval == SOCKET_ERROR) {
+                err_display("recv()");
+                break;
+            }
+            else if (retval == 0)
+                break;
+            
+            char ID[12] = "";
+            memset(ID, *buf, 12);
+            if (CheckID(ID) && nowID < 3)
+            {
+                memset(Player[nowID].nickname, *ID, 12);
+                SendID_OK(true);
+                ++nowID;
+                break;
+            }
+            else{ SendID_OK(false); }
+        } while (true);
+        
         // 스레드 생성
         //hThread = CreateThread(NULL, 0, FileSendThread, (LPVOID)client_sock, 0, NULL);
         if (hThread == NULL) closesocket(client_sock);
         else CloseHandle(hThread);
     }
     
+
+
     closesocket(listen_sock);
 
     WSACleanup();
