@@ -7,6 +7,20 @@
 using namespace std;
 PlayerInfo Player[3];
 int nowID{};
+
+bool CheckID(const char* ID)
+{
+    for (int i = 0; i < nowID; ++i)
+    {
+        if (strcmp(Player[i].nickname, ID) == false) {
+            cout << "중복있음" << endl << endl;
+            return false;
+        }
+    }
+    cout << "중복 없음" << endl << endl;
+    return true;
+}
+
 void err_quit(const char* msg)
 {
     LPVOID lpMsgBuf;
@@ -85,7 +99,7 @@ int main()
     SOCKET client_sock;
     SOCKADDR_IN clientaddr;
     int addrlen;
-    char buf[256] = "";
+    char ID[256] = "";
     int len;
 
     HANDLE hThread;
@@ -110,9 +124,9 @@ int main()
             }
             else if (retval == 0)
                 break;
-            char* bus = new char[len + 1];
+
             // 데이터 받기(가변 길이)
-            retval = recvn(client_sock, buf, len, 0);
+            retval = recvn(client_sock, ID, len, 0);
             if (retval == SOCKET_ERROR) {
                 err_display("recv()");
                 break;
@@ -120,16 +134,15 @@ int main()
             else if (retval == 0)
                 break;
             
-            char ID[12] = "";
-            memset(ID, *buf, 12);
+            ID[retval] = '\0';
+
             if (CheckID(ID) && nowID < 3)
             {
-                memset(Player[nowID].nickname, *ID, 12);
                 SendID_OK(true);
-                ++nowID;
-                break;
+
             }
             else{ SendID_OK(false); }
+
         } while (true);
         
         // 스레드 생성
