@@ -2,7 +2,8 @@
 #pragma comment(lib, "ws2_32")
 #include <iostream>
 #include <WinSock2.h>
-#include "framework.h"
+#include "PacketDefine.h"
+//#include "framework.h"
 
 using namespace std;
 PlayerInfo Player[3];
@@ -15,7 +16,22 @@ void SaveID(const char* NewID)
 
     cout << "저장완료" << endl;
 }
-
+void SendID_OK(bool duplicated, SOCKET client_sock) {
+    if (duplicated)
+    {
+        ClientLoginOKPacket packet;
+        packet.size = 1;
+        packet.type = NICKNAME_USE;
+        int retval = send(client_sock, (char*)&packet, sizeof(packet),0);
+    }
+    else
+    {
+        ClientLoginOKPacket packet;
+        packet.size = 1;
+        packet.type = NICKNAME_UNUSE;
+        int retval = send(client_sock, (char*)&packet, sizeof(packet), 0);
+    }
+}
 bool CheckID(const char* ID)
 {
     for (int i = 0; i < nowID; ++i)
@@ -74,8 +90,6 @@ int recvn(SOCKET s, char* buf, int len, int flags)
 
     return (len - left);
 }
-
-void SendID_OK(bool duplicated) {}
 
 
 int main()
@@ -147,10 +161,10 @@ int main()
 
             if (CheckID(ID) && nowID < 3)
             {
-                SendID_OK(true);
+                SendID_OK(true, client_sock);
 
             }
-            else{ SendID_OK(false); }
+            else{ SendID_OK(false, client_sock); }
 
         } while (true);
         
