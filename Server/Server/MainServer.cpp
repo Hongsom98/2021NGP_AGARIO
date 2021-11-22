@@ -139,6 +139,8 @@ int main()
     char ID[256] = "";
     int len;
 
+    char type;
+
     HANDLE hThread;
     
     while (1) {
@@ -153,34 +155,23 @@ int main()
         printf("\n[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n",
             inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
 
-        do {
-            retval = recvn(client_sock, (char*)&len, sizeof(int), 0);
-            if (retval == SOCKET_ERROR) {
-                err_display("recv()");
-                break;
-            }
-            else if (retval == 0)
-                break;
-
-            // 데이터 받기(가변 길이)
-            retval = recvn(client_sock, ID, len, 0);
-            if (retval == SOCKET_ERROR) {
-                err_display("recv()");
-                break;
-            }
-            else if (retval == 0)
-                break;
+        while(1){
+            retval = recvn(client_sock, (char*)&type, sizeof(type), 0);
             
-            ID[retval] = '\0';
-
-            if (CheckID(ID) && nowID < 3)
+            switch (type)
             {
-                SendID_OK(true, client_sock);
+            case NICKNAME_ADD:
+                ClientLoginPacket packet;
+                retval = recvn(client_sock, (char*)&packet, sizeof(packet), 0);
+                if (CheckID(packet.nickname) && nowID < 3) {
+                    SaveID(packet.nickname);
+                    SendID_OK(true, client_sock);
+                    break;
+                }
+                else SendID_OK(false, client_sock); break;
+            }         
 
-            }
-            else{ SendID_OK(false, client_sock); }
-
-        } while (true);
+        }
         
         // 스레드 생성
         //hThread = CreateThread(NULL, 0, FileSendThread, (LPVOID)client_sock, 0, NULL);
