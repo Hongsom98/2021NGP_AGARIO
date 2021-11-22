@@ -102,5 +102,6 @@ $RECYCLE.BIN/
 *.lnk
 
 Debug/
+.vs/
 
 # End of https://www.toptal.com/developers/gitignore/api/c,c++,windows
