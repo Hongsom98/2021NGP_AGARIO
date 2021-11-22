@@ -5,6 +5,9 @@
 #include "ServerFunction.h"
 #include "Player.h"
 #include "GameObject.h"
+#include "Map.h"
+
+
 #define MAX_LOADSTRING 100
 
 HINSTANCE hInst;                                
@@ -13,6 +16,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];
 HWND hWnd;
 Player player;
 GameObject feeds;
+Map map;
 POINT camera{ 300, 300 };
 TCHAR InputID[12] = { 0, };
 bool isConnection{ false };
@@ -187,6 +191,7 @@ void Render()
     PatBlt(memDC, 0, 0, MAP_WIDTH, MAP_HEIGHT, WHITENESS);
 
     if (isConnection) {
+        map.Draw(memDC);
         player.Draw(memDC);
         feeds.Draw(memDC);
 

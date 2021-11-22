@@ -47,8 +47,8 @@
     <ClInclude Include="GameObject.h">
       <Filter>소스 파일\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="ServerFunction.h">
-      <Filter>소스 파일</Filter>
+    <ClInclude Include="Map.h">
+      <Filter>소스 파일\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -62,6 +62,9 @@
       <Filter>소스 파일\Objects</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
+      <Filter>소스 파일\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
       <Filter>소스 파일\Objects</Filter>
     </ClCompile>
   </ItemGroup>
