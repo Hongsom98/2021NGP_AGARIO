@@ -5,6 +5,7 @@
 #include "UserDefine.h"
 #include "PacketDefine.h"
 #include "Player.h"
+#include "GameObject.h"
 
 
 #define MAX_LOADSTRING 100
@@ -14,6 +15,7 @@ WCHAR szTitle[MAX_LOADSTRING];
 WCHAR szWindowClass[MAX_LOADSTRING];     
 HWND hWnd;
 Player player;
+GameObject feeds;
 POINT camera{ 300, 300 };
 
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -26,6 +28,10 @@ void Render();
 void FORTEST()
 {
     player.Init("TEST");
+    Feed test[MAXFEED];
+    test[0].Center = { 400,400 }; test[0].Radius = 10;
+    test[1].Center = { 450,400 }; test[1].Radius = 10;
+    feeds.Update(test);
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
@@ -171,7 +177,7 @@ void Render()
     PatBlt(memDC, 0, 0, MAP_WIDTH, MAP_HEIGHT, WHITENESS);
 
     player.Draw(memDC);
-    //먹이 draw
+    feeds.Draw(memDC);
     
     POINT playerCenter = player.GetCenter();
     StretchBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memDC,
