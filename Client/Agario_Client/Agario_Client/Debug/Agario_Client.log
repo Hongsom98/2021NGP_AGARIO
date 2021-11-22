@@ -1,0 +1,6 @@
+﻿  Player.cpp
+D:\KPU\2021_2\네트워크게임프로그래밍\Agario\2021NGP_AGARIO\Client\Agario_Client\Agario_Client\Player.cpp(49,35): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\KPU\2021_2\네트워크게임프로그래밍\Agario\2021NGP_AGARIO\Client\Agario_Client\Agario_Client\Player.cpp(48,35): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\KPU\2021_2\네트워크게임프로그래밍\Agario\2021NGP_AGARIO\Client\Agario_Client\Agario_Client\Player.cpp(47,35): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\KPU\2021_2\네트워크게임프로그래밍\Agario\2021NGP_AGARIO\Client\Agario_Client\Agario_Client\Player.cpp(46,47): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  Agario_Client.vcxproj -> D:\KPU\2021_2\네트워크게임프로그래밍\Agario\2021NGP_AGARIO\Client\Agario_Client\Debug\Agario_Client.exe

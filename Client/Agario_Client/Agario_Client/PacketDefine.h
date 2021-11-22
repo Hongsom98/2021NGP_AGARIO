@@ -9,12 +9,6 @@
 #define INPUTDATA		111
 #define GAMEOVER		112
 
-struct Feed
-{
-	float Center;
-	float Radiuse;
-};
-
 struct ClientLoginPacket
 {
 	char size;

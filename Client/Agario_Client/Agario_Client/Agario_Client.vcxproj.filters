@@ -5,10 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="리소스 파일">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -16,31 +12,37 @@
     <Filter Include="소스 파일\Window">
       <UniqueIdentifier>{e20a87d6-995b-443c-8283-a944381c24c3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일\Window">
-      <UniqueIdentifier>{0eeb35c8-3108-4733-9198-db51168e279b}</UniqueIdentifier>
+    <Filter Include="소스 파일\Objects">
+      <UniqueIdentifier>{e5db2df6-3fa4-4c85-9a71-3915093882fa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일\UserDefine">
+    <Filter Include="소스 파일\UserDefine">
       <UniqueIdentifier>{8f8d7449-46e2-4e0c-b11b-e32a9afc662d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Agario_Client.h">
-      <Filter>헤더 파일\Window</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>헤더 파일\Window</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>헤더 파일\Window</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>헤더 파일\Window</Filter>
-    </ClInclude>
     <ClInclude Include="framework.h">
-      <Filter>헤더 파일\UserDefine</Filter>
+      <Filter>소스 파일\UserDefine</Filter>
     </ClInclude>
     <ClInclude Include="PacketDefine.h">
-      <Filter>헤더 파일\UserDefine</Filter>
+      <Filter>소스 파일\UserDefine</Filter>
+    </ClInclude>
+    <ClInclude Include="UserDefine.h">
+      <Filter>소스 파일\UserDefine</Filter>
+    </ClInclude>
+    <ClInclude Include="Agario_Client.h">
+      <Filter>소스 파일\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>소스 파일\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>소스 파일\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>소스 파일\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>소스 파일\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +51,9 @@
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>소스 파일\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>소스 파일\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
