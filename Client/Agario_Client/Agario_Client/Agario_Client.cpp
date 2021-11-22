@@ -6,6 +6,7 @@
 #include "PacketDefine.h"
 #include "Player.h"
 #include "GameObject.h"
+#include "Map.h"
 
 
 #define MAX_LOADSTRING 100
@@ -16,6 +17,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];
 HWND hWnd;
 Player player;
 GameObject feeds;
+Map map;
 POINT camera{ 300, 300 };
 
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -176,6 +178,7 @@ void Render()
     SelectObject(memDC, (HBITMAP)hBitmap);
     PatBlt(memDC, 0, 0, MAP_WIDTH, MAP_HEIGHT, WHITENESS);
 
+    map.Draw(memDC);
     player.Draw(memDC);
     feeds.Draw(memDC);
     

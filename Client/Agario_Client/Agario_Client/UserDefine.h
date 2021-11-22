@@ -8,8 +8,8 @@
 
 #define MAXFEED			300
 
-#define MAP_WIDTH		2560
-#define MAP_HEIGHT		1440
+#define MAP_WIDTH		2500
+#define MAP_HEIGHT		2500
 
 struct Feed
 {
