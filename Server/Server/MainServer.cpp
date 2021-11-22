@@ -8,6 +8,14 @@ using namespace std;
 PlayerInfo Player[3];
 int nowID{};
 
+void SaveID(const char* NewID)
+{
+    strncpy(Player[nowID].nickname, NewID, strlen(NewID));
+    nowID++;
+
+    cout << "저장완료" << endl;
+}
+
 bool CheckID(const char* ID)
 {
     for (int i = 0; i < nowID; ++i)
@@ -17,6 +25,7 @@ bool CheckID(const char* ID)
             return false;
         }
     }
+    SaveID(ID);
     cout << "중복 없음" << endl << endl;
     return true;
 }
