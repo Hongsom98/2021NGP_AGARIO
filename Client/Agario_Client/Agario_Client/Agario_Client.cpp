@@ -1,13 +1,10 @@
 ﻿#include "pch.h"
 #include "framework.h"
 #include "Agario_Client.h"
-
 #include "UserDefine.h"
-#include "PacketDefine.h"
+#include "ServerFunction.h"
 #include "Player.h"
 #include "GameObject.h"
-
-
 #define MAX_LOADSTRING 100
 
 HINSTANCE hInst;                                
@@ -17,6 +14,8 @@ HWND hWnd;
 Player player;
 GameObject feeds;
 POINT camera{ 300, 300 };
+TCHAR InputID[12] = { 0, };
+bool isConnection{ false };
 
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -52,16 +51,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_AGARIOCLIENT));
 
     MSG msg;
-
-   /* while (GetMessage(&msg, nullptr, 0, 0))
-    {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-    }*/
-
     memset(&msg, 0, sizeof(msg));
 
     while (msg.message != WM_QUIT)
@@ -78,6 +67,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         }
     }
 
+    closesocket(sock);
+    WSACleanup();
 
     return (int) msg.wParam;
 }
@@ -123,10 +114,24 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    static int len = 0;
+
     switch (message)
     {
     case WM_CREATE:
         FORTEST();
+        break;
+    case WM_CHAR:
+        if (wParam == VK_RETURN)
+            SendID(InputID);
+        else if (wParam == VK_BACK) {
+            if (len == 0) break;
+            InputID[--len] = 0;
+        }
+        else {
+            if (len == 12) break;
+            InputID[len++] = (TCHAR)wParam;
+        }
         break;
     case WM_PAINT:
         {
@@ -165,7 +170,12 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 void Update()
 {
+    if (isConnection) {
 
+    }
+    else {
+
+    }
 }
 
 void Render()
@@ -176,13 +186,27 @@ void Render()
     SelectObject(memDC, (HBITMAP)hBitmap);
     PatBlt(memDC, 0, 0, MAP_WIDTH, MAP_HEIGHT, WHITENESS);
 
-    player.Draw(memDC);
-    feeds.Draw(memDC);
-    
-    POINT playerCenter = player.GetCenter();
-    StretchBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memDC,
-        playerCenter.x - camera.x, playerCenter.y - camera.y, 
-        camera.x * 2, camera.y * 2, SRCCOPY);
+    if (isConnection) {
+        player.Draw(memDC);
+        feeds.Draw(memDC);
+
+        POINT playerCenter = player.GetCenter();
+        StretchBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memDC,
+            playerCenter.x - camera.x, playerCenter.y - camera.y,
+            camera.x * 2, camera.y * 2, SRCCOPY);
+    }
+    else {
+        HPEN hpen = (HPEN)CreatePen(PS_SOLID, 3, RGB(0, 0, 0));
+        HPEN oldpen = (HPEN)SelectObject(hdc, hpen);
+        SetBkMode(hdc, TRANSPARENT);
+        TextOut(memDC, WINDOW_WIDTH / 2 - lstrlen(InputID), WINDOW_HEIGHT / 2, 
+            InputID, lstrlen(InputID));
+        SelectObject(hdc, oldpen);
+        DeleteObject(hpen);
+
+        BitBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memDC, 0, 0, SRCCOPY);
+    }
+
     DeleteDC(memDC);
     ReleaseDC(hWnd, hdc);
 }

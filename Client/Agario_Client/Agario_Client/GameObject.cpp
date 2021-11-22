@@ -17,8 +17,6 @@ void GameObject::Update(const Feed* NewFeed)
 
 void GameObject::Draw(HDC hdc)
 {
-	
-
 	for (int i = 0; i < MAXFEED; ++i)
 	{
 		HBRUSH myBrush = (HBRUSH)CreateSolidBrush(Brushes[i]);

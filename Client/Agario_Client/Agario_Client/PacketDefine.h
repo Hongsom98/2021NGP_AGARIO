@@ -8,12 +8,13 @@
 #define GAMEOBJECTLIST	110
 #define INPUTDATA		111
 #define GAMEOVER		112
+#define TCPPORT			54321
 
 struct ClientLoginPacket
 {
 	char size;
 	char type;
-	char nickname[12];
+	char ID[12];
 };
 
 struct ClientLoginOKPacket

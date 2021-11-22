@@ -47,6 +47,9 @@
     <ClInclude Include="GameObject.h">
       <Filter>소스 파일\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="ServerFunction.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Agario_Client.cpp">
