@@ -50,6 +50,7 @@ int recvn(SOCKET s, char* buf, int len, int flags)
 
     return (len - left);
 }
+
 int main()
 {
     int retval;
@@ -80,11 +81,11 @@ int main()
     SOCKET client_sock;
     SOCKADDR_IN clientaddr;
     int addrlen;
-    char buf[BUFSIZE + 1] = "";
+    
     int len;
 
     HANDLE hThread;
-    InitializeCriticalSection(&cs);
+    
     while (1) {
 
         addrlen = sizeof(clientaddr);
@@ -94,11 +95,11 @@ int main()
             break;
         }
         // 스레드 생성
-        hThread = CreateThread(NULL, 0, FileSendThread, (LPVOID)client_sock, 0, NULL);
+        //hThread = CreateThread(NULL, 0, FileSendThread, (LPVOID)client_sock, 0, NULL);
         if (hThread == NULL) closesocket(client_sock);
         else CloseHandle(hThread);
     }
-    DeleteCriticalSection(&cs);
+    
     closesocket(listen_sock);
 
     WSACleanup();

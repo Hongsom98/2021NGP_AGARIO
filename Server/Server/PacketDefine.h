@@ -1,5 +1,5 @@
 #pragma once
-
+#include "framework.h"
 #define NICKNAME_ADD	10
 #define NICKNAME_USE	11
 #define NICKNAME_UNUSE	12
@@ -24,10 +24,6 @@ struct GameObject
 	float Center;
 	float Radius;
 };
-struct BOT
-{
-
-};
 
 struct ClientLoginPacket
 {
@@ -46,7 +42,7 @@ struct PlayerListPacket
 {
 	char size;
 	char type;
-	PlayerInfo playerlist[3];
+	PlayerInfo Playerlists;
 	char rank[3];
 };
 
@@ -54,8 +50,8 @@ struct GameObjectListPacket
 {
 	char size;
 	char type;
-	Feed list[MAXFEED];
-	Trap list[MAXTRAP];
+	Feed FeedList[MAXFEED];
+	Trap TrapList[MAXTRAP];
 };
 
 struct GameOverPacket

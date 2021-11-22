@@ -18,7 +18,7 @@
 #define MAXTRAP			30
 #define MAXBOT			10
 
-#include "PacketDefine.h"
+//#include "PacketDefine.h"
 
 
 
