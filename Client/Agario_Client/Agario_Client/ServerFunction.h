@@ -77,20 +77,11 @@ void SendID(char* ID)
     ClientLoginPacket temp;
     temp.size = sizeof(ClientLoginPacket);
     temp.type = NICKNAME_ADD;
-    strcpy(temp.ID, ID);
-    char buf[255]{ 0 };
-    buf[0] = NICKNAME_ADD;
-    retval = send(sock, buf, sizeof(buf), 0);
-    if (retval == SOCKET_ERROR) {
-        err_display("send()");
-        return;
-    }
+    strncpy(temp.ID, ID, strlen(ID));
+    temp.ID[strlen(ID)] = '\0';
 
-	retval = send(sock, (char*)&temp, sizeof(temp), 0);
-	if (retval == SOCKET_ERROR) {
-		err_display("send()");
-		return;
-	}
+    send(sock, (char*)&temp.type, sizeof(temp.type), 0);
+    send(sock, (char*)&temp, sizeof(temp), 0);
 }
 
 bool RecvIDCheck()
