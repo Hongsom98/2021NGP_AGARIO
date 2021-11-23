@@ -106,6 +106,45 @@ int recvn(SOCKET s, char* buf, int len, int flags)
     return (len - left);
 }
 
+// 클라이언트와 데이터 통신
+DWORD WINAPI ProcessClient(LPVOID arg)
+{
+    SOCKET client_sock = (SOCKET)arg;
+    int retval;
+    SOCKADDR_IN clientaddr;
+    int addrlen;
+
+    // 클라이언트 정보 얻기
+    addrlen = sizeof(clientaddr);
+    getpeername(client_sock, (SOCKADDR*)&clientaddr, &addrlen);
+    char type;
+
+    while (1) {
+        while (1) {
+            retval = recvn(client_sock, (char*)&type, sizeof(type), 0);
+
+            switch (type)
+            {
+            case NICKNAME_ADD:
+                ClientLoginPacket packet;
+                retval = recvn(client_sock, (char*)&packet, sizeof(packet), 0);
+                if (CheckID(packet.nickname) && nowID < 3)
+                {
+                    SaveID(packet.nickname);
+                    SendID_OK(true, client_sock);
+                    break;
+                }
+                else SendID_OK(false, client_sock); break;
+
+            default:
+                break;
+            }
+        }
+    }
+    closesocket(client_sock);
+
+    return 0;
+}
 
 int main()
 {
@@ -156,33 +195,12 @@ int main()
         printf("\n[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n",
             inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
 
-        while(1){
-            char buf[255];
-            retval = recvn(client_sock, buf, 255, 0);
-            type = buf[0];
-            switch (type)
-            {
-            case NICKNAME_ADD:
-                ClientLoginPacket packet;
-                retval = recvn(client_sock, (char*)&packet, sizeof(packet), 0);
-                if (CheckID(packet.nickname) && nowID < 3) {
-                    SaveID(packet.nickname);
-                    SendID_OK(true, client_sock);
-                    break;
-                }
-                else SendID_OK(false, client_sock); break;
-            }         
-
-        }
-        
-        // 스레드 생성
-        //hThread = CreateThread(NULL, 0, FileSendThread, (LPVOID)client_sock, 0, NULL);
-        if (hThread == NULL) closesocket(client_sock);
-        else CloseHandle(hThread);
+        hThread = CreateThread(NULL, 0, ProcessClient,
+            (LPVOID)client_sock, 0, NULL);
+        if (hThread == NULL) { closesocket(client_sock); }
+        else { CloseHandle(hThread); }
     }
     
-
-
     closesocket(listen_sock);
 
     WSACleanup();
