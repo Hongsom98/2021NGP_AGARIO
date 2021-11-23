@@ -1,5 +1,4 @@
-﻿
-#include "pch.h"
+﻿#include "pch.h"
 #include "framework.h"
 #include "Agario_Client.h"
 #include "UserDefine.h"
@@ -7,26 +6,14 @@
 #include "Player.h"
 #include "GameObject.h"
 #include "Map.h"
-#pragma comment(lib, "ws2_32.lib");
+#pragma comment(lib, "ws2_32.lib")
 
-#define MAX_LOADSTRING 100
-
-HINSTANCE hInst;                                
-WCHAR szTitle[MAX_LOADSTRING];                  
-WCHAR szWindowClass[MAX_LOADSTRING];     
-HWND hWnd;
 Player player;
 GameObject feeds;
 Map map;
 POINT camera{ 300, 300 };
 TCHAR InputID[12] = { 0, };
 bool isConnection{ false };
-ATOM                MyRegisterClass(HINSTANCE hInstance);
-BOOL                InitInstance(HINSTANCE, int);
-LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-void Update();
-void Render();
 
 void FORTEST()
 {
@@ -37,8 +24,7 @@ void FORTEST()
     feeds.Update(test);
 }
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
-    _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow)
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -126,48 +112,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     switch (message)
     {
-    case WM_CREATE:
-        FORTEST();
-        Render();
-        break;
-    case WM_CHAR:
-        if (wParam == VK_RETURN) {
-            if (!isConnection) {
-                SendID(InputID);
-                if (RecvIDCheck())
-                {
-                    isConnection = true;
-                    Render();
-                }
-                else {
-                    memset(InputID, 0, 12);
-                    len = 0;
+        case WM_CREATE:
+            FORTEST();
+            Render();
+            break;
+        case WM_CHAR:
+            if (wParam == VK_RETURN) {
+                if (!isConnection) {
+                    SendID(InputID);
+                    if (RecvIDCheck()) isConnection = true;
+                    else {
+                        memset(InputID, 0, 12);
+                        len = 0;
+                    }
                 }
             }
-        }
-        else if (wParam == VK_BACK) {
-            if (len == 0) break;
-            InputID[--len] = 0;
+            else if (wParam == VK_BACK) {
+                if (len == 0) break;
+                InputID[--len] = 0;
+            }
+            else {
+                if (len == 12) break;
+                InputID[len++] = (TCHAR)wParam;
+            }
             Render();
-        }
-        else {
-            if (len == 12) break;
-            InputID[len++] = (TCHAR)wParam;
-            Render();
-        }
-        break;
-    case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            EndPaint(hWnd, &ps);
-        }
-        break;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
-    default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
+            break;
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            break;
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return 0;
 }
@@ -177,16 +151,16 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     UNREFERENCED_PARAMETER(lParam);
     switch (message)
     {
-    case WM_INITDIALOG:
-        return (INT_PTR)TRUE;
-
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            EndDialog(hDlg, LOWORD(wParam));
+        case WM_INITDIALOG:
             return (INT_PTR)TRUE;
-        }
-        break;
+
+        case WM_COMMAND:
+            if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+            {
+                EndDialog(hDlg, LOWORD(wParam));
+                return (INT_PTR)TRUE;
+            }
+            break;
     }
     return (INT_PTR)FALSE;
 }
