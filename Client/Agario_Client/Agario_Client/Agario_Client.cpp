@@ -3,11 +3,11 @@
 #include "framework.h"
 #include "Agario_Client.h"
 #include "UserDefine.h"
-int test{ 0 };
 #include "ServerFunction.h"
 #include "Player.h"
 #include "GameObject.h"
 #include "Map.h"
+#pragma comment(lib, "ws2_32.lib");
 
 #define MAX_LOADSTRING 100
 
@@ -128,9 +128,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CHAR:
         if (wParam == VK_RETURN) {
             if (!isConnection) {
-                test++;
                 SendID(InputID);
-                test++;
                 if (RecvIDCheck()) isConnection = true;
                 else {
                     memset(InputID, 0, 12);

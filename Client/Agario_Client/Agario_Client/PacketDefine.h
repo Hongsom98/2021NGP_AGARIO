@@ -8,7 +8,7 @@
 #define GAMEOBJECTLIST	110
 #define INPUTDATA		111
 #define GAMEOVER		112
-#define TCPPORT			9000
+#define TCPPORT			54321
 
 struct ClientLoginPacket
 {

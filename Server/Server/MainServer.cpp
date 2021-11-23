@@ -4,6 +4,7 @@
 #include <WinSock2.h>
 #include "PacketDefine.h"
 //#include "framework.h"
+#pragma warning(disable:4996)
 
 using namespace std;
 PlayerInfo Player[3];

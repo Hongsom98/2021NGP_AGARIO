@@ -56,7 +56,6 @@ int recvn(SOCKET s, char* buf, int len, int flags)
 
 void SendID(char* ID)
 {
-    test++;
 	int retval;
 
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
@@ -103,7 +102,7 @@ bool RecvIDCheck()
         return false;
     }
 
-    return temp.type == NICKNAME_UNUSE ? true : false;
+    return temp.type == NICKNAME_USE ? true : false;
 }
 
 void RecvObjects()
