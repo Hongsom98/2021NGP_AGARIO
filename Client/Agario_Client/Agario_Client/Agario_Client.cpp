@@ -148,6 +148,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         else if (wParam == VK_BACK) {
             if (len == 0) break;
             InputID[--len] = 0;
+            Render();
         }
         else {
             if (len == 12) break;

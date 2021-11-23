@@ -50,12 +50,12 @@ void Player::Draw(HDC hdc)
 	
 	SelectObject(hdc, oldBrush);
 	DeleteObject(myBrush);
-
+		
 	HPEN hpen = (HPEN)CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
 	HPEN oldpen = (HPEN)SelectObject(hdc, hpen);
 	SetBkMode(hdc, TRANSPARENT);
 	TextOut(hdc, InfoData.SellData[0].Center.x - 10, InfoData.SellData[0].Center.y - 10,
-		TEXT("FOR TESTING"), lstrlen(TEXT("FOR TESTING")));
+		InfoData.ID, lstrlen(InfoData.ID));
 	SelectObject(hdc, oldpen);
 	DeleteObject(hpen);
 	
