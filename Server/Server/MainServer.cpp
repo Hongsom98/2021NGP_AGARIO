@@ -42,7 +42,6 @@ bool CheckID(const char* ID)
             return false;
         }
     }
-    SaveID(ID);
     cout << "중복 없음" << endl << endl;
     return true;
 }
@@ -113,34 +112,35 @@ DWORD WINAPI ProcessClient(LPVOID arg)
     int retval;
     SOCKADDR_IN clientaddr;
     int addrlen;
+    int ClientNum = nowID;
 
     // 클라이언트 정보 얻기
     addrlen = sizeof(clientaddr);
     getpeername(client_sock, (SOCKADDR*)&clientaddr, &addrlen);
     char type;
 
-    while (1) {
-        while (1) {
-            retval = recvn(client_sock, (char*)&type, sizeof(type), 0);
+    if (Player[ClientNum].nickname[0] == '\0')
+    {
+        retval = recvn(client_sock, (char*)&type, sizeof(type), 0);
 
-            switch (type)
+        switch (type)
+        {
+        case NICKNAME_ADD:
+            ClientLoginPacket packet;
+            retval = recvn(client_sock, (char*)&packet, sizeof(packet), 0);
+            if (CheckID(packet.nickname) && nowID < 3)
             {
-            case NICKNAME_ADD:
-                ClientLoginPacket packet;
-                retval = recvn(client_sock, (char*)&packet, sizeof(packet), 0);
-                if (CheckID(packet.nickname) && nowID < 3)
-                {
-                    SaveID(packet.nickname);
-                    SendID_OK(true, client_sock);
-                    break;
-                }
-                else SendID_OK(false, client_sock); break;
-
-            default:
+                SaveID(packet.nickname);
+                SendID_OK(true, client_sock);
                 break;
             }
+            else SendID_OK(false, client_sock); break;
+
+        default:
+            break;
         }
     }
+    
     closesocket(client_sock);
 
     return 0;

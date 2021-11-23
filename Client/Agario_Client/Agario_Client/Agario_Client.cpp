@@ -55,7 +55,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_AGARIOCLIENT));
 
     MSG msg;
-    memset(&msg, 0, sizeof(msg));
+    while (GetMessage(&msg, 0, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+    /*memset(&msg, 0, sizeof(msg));
 
     while (msg.message != WM_QUIT)
     {
@@ -68,8 +72,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         {
             Update();
             Render();
-        }
-    }
+            }
+    }*/
 
     closesocket(sock);
     WSACleanup();
@@ -124,12 +128,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
         FORTEST();
+        Render();
         break;
     case WM_CHAR:
         if (wParam == VK_RETURN) {
             if (!isConnection) {
                 SendID(InputID);
-                if (RecvIDCheck()) isConnection = true;
+                if (RecvIDCheck())
+                {
+                    isConnection = true;
+                    Render();
+                }
                 else {
                     memset(InputID, 0, 12);
                     len = 0;
@@ -143,6 +152,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         else {
             if (len == 12) break;
             InputID[len++] = (TCHAR)wParam;
+            Render();
         }
         break;
     case WM_PAINT:
