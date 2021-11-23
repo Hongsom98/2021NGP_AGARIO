@@ -156,8 +156,9 @@ int main()
             inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
 
         while(1){
-            retval = recvn(client_sock, (char*)&type, sizeof(type), 0);
-            
+            char buf[255];
+            retval = recvn(client_sock, buf, 255, 0);
+            type = buf[0];
             switch (type)
             {
             case NICKNAME_ADD:
