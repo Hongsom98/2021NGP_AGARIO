@@ -65,3 +65,8 @@ POINT Player::GetCenter()
 {
 	return InfoData.SellData[0].Center;
 }
+
+TCHAR* Player::GetID()
+{
+	return (TCHAR*)InfoData.ID;
+}

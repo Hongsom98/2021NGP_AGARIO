@@ -13,4 +13,5 @@ public:
 	void Update(const PlayerInfo& NewData);
 	void Draw(HDC hdc);
 	POINT GetCenter();
+	TCHAR* GetID();
 };

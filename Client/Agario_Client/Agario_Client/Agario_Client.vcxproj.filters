@@ -50,6 +50,7 @@
     <ClInclude Include="Map.h">
       <Filter>소스 파일\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="ServerFunction.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Agario_Client.cpp">

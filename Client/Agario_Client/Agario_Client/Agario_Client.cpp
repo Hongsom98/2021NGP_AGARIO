@@ -1,12 +1,13 @@
-﻿#include "pch.h"
+﻿
+#include "pch.h"
 #include "framework.h"
 #include "Agario_Client.h"
 #include "UserDefine.h"
+int test{ 0 };
 #include "ServerFunction.h"
 #include "Player.h"
 #include "GameObject.h"
 #include "Map.h"
-
 
 #define MAX_LOADSTRING 100
 
@@ -20,7 +21,6 @@ Map map;
 POINT camera{ 300, 300 };
 TCHAR InputID[12] = { 0, };
 bool isConnection{ false };
-
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -126,8 +126,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         FORTEST();
         break;
     case WM_CHAR:
-        if (wParam == VK_RETURN)
-            SendID(InputID);
+        if (wParam == VK_RETURN) {
+            if (!isConnection) {
+                test++;
+                SendID(InputID);
+                test++;
+                if (RecvIDCheck()) isConnection = true;
+                else {
+                    memset(InputID, 0, 12);
+                    len = 0;
+                }
+            }
+        }
         else if (wParam == VK_BACK) {
             if (len == 0) break;
             InputID[--len] = 0;
@@ -174,12 +184,8 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 void Update()
 {
-    if (isConnection) {
+    if (!isConnection) return;
 
-    }
-    else {
-
-    }
 }
 
 void Render()
@@ -204,7 +210,7 @@ void Render()
         HPEN hpen = (HPEN)CreatePen(PS_SOLID, 3, RGB(0, 0, 0));
         HPEN oldpen = (HPEN)SelectObject(hdc, hpen);
         SetBkMode(hdc, TRANSPARENT);
-        TextOut(memDC, WINDOW_WIDTH / 2 - lstrlen(InputID), WINDOW_HEIGHT / 2, 
+        TextOut(memDC, WINDOW_WIDTH / 2 - lstrlen(InputID), WINDOW_HEIGHT / 2,
             InputID, lstrlen(InputID));
         SelectObject(hdc, oldpen);
         DeleteObject(hpen);

@@ -30,6 +30,7 @@ void err_display(const char* msg)
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         (LPTSTR)&lpMsgBuf, 0, NULL);
     printf("[%s] %s", msg, (char*)lpMsgBuf);
+    char* temp = (char*)lpMsgBuf;
     LocalFree(lpMsgBuf);
 }
 
@@ -55,6 +56,7 @@ int recvn(SOCKET s, char* buf, int len, int flags)
 
 void SendID(char* ID)
 {
+    test++;
 	int retval;
 
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
@@ -66,7 +68,6 @@ void SendID(char* ID)
 
 	ZeroMemory(&serveraddr, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
-
 	serveraddr.sin_addr.s_addr = inet_addr(SERVERIP);
 	serveraddr.sin_port = htons(TCPPORT);
 
@@ -78,6 +79,13 @@ void SendID(char* ID)
     temp.size = sizeof(ClientLoginPacket);
     temp.type = NICKNAME_ADD;
     strcpy(temp.ID, ID);
+    char buf[255]{ 0 };
+    buf[0] = NICKNAME_ADD;
+    retval = send(sock, buf, sizeof(buf), 0);
+    if (retval == SOCKET_ERROR) {
+        err_display("send()");
+        return;
+    }
 
 	retval = send(sock, (char*)&temp, sizeof(temp), 0);
 	if (retval == SOCKET_ERROR) {
@@ -86,54 +94,19 @@ void SendID(char* ID)
 	}
 }
 
-//int main(int argc, char* argv[])
-//{
-//
-//	
-//	
-//
-//	
-//
-//	
-//	
-//
-//
-//	char buf[BUFSIZE + 1];
-//	int len;
-//
-//	while (true)
-//	{
-//		printf("\n[보낼 데이터]:");
-//		if (fgets(buf, BUFSIZE + 1, stdin) == NULL)
-//			break;
-//
-//		len = strlen(buf);
-//		if (buf[len - 1] == '\n')
-//			buf[len - 1] = '\0';
-//		if (strlen(buf) == 0)
-//			break;
-//
-//		retval = send(sock, buf, strlen(buf), 0);
-//		if (retval == SOCKET_ERROR) {
-//			err_display("send()");
-//			break;
-//		}
-//		printf("[TCP 클라이언트] %d바이트를 보냈습니다.\n", retval);
-//
-//		retval = recvn(sock, buf, retval, 0);
-//		if (retval == SOCKET_ERROR) {
-//			err_display("recv()");
-//			break;
-//		}
-//		else if (retval == 0)
-//			break;
-//
-//		buf[retval] = '\0';
-//		printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
-//		printf("[받은 데이터] %s\n", buf);
-//	}
-//
-//	closesocket(sock);
-//
-//	WSACleanup();
-//}
+bool RecvIDCheck()
+{
+    ClientLoginOKPacket temp;
+    int retval = recvn(sock, (char*)&temp, sizeof(ClientLoginOKPacket), 0);
+    if (retval == SOCKET_ERROR) {
+        err_display("recv()");
+        return false;
+    }
+
+    return temp.type == NICKNAME_UNUSE ? true : false;
+}
+
+void RecvObjects()
+{
+
+}
