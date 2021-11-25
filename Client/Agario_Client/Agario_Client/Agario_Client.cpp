@@ -6,14 +6,18 @@
 #include "Player.h"
 #include "GameObject.h"
 #include "Map.h"
-#pragma comment(lib, "ws2_32.lib")
+//#include <iostream>
+//#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
+#define FPS 30
 
 Player player;
 GameObject feeds;
 Map map;
 POINT camera{ 300, 300 };
-TCHAR InputID[12] = { 0, };
+TCHAR InputID[12] = { 0 };
 bool isConnection{ false };
+HDC memDC;
+HBITMAP hBitmap;
 
 void FORTEST()
 {
@@ -33,33 +37,52 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     LoadStringW(hInstance, IDC_AGARIOCLIENT, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
-    if (!InitInstance (hInstance, nCmdShow))
-    {
-        return FALSE;
-    }
+    if (!InitInstance (hInstance, nCmdShow)) return FALSE;
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_AGARIOCLIENT));
 
     MSG msg;
-    while (GetMessage(&msg, 0, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+    memset(&msg, 0, sizeof(msg));
+    BOOL PerformFlg = FALSE;
+    LONGLONG NowTime = 0;
+    LONGLONG LastTime = 0;
+    LONGLONG Frequency = 0;
+    LONGLONG OneFrameCnt = 0;
+
+    if (::QueryPerformanceFrequency((LARGE_INTEGER*)&Frequency)) {
+        PerformFlg = TRUE;
+        OneFrameCnt = Frequency / FPS;
+        ::QueryPerformanceCounter((LARGE_INTEGER*)&LastTime);
     }
-    /*memset(&msg, 0, sizeof(msg));
+    else {
+        PerformFlg = FALSE;
+        timeBeginPeriod(1);
+        OneFrameCnt = 1000 / FPS;
+        LastTime = (LONGLONG)::timeGetTime();
+    }
+
 
     while (msg.message != WM_QUIT)
     {
-        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-        {
+        if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-        else
-        {
-            Update();
-            Render();
+        else {
+            if (PerformFlg) ::QueryPerformanceCounter((LARGE_INTEGER*)&NowTime);
+            else {
+                NowTime = ::timeGetTime();
+                if (LastTime > NowTime) LastTime = NowTime;
             }
-    }*/
+            if (NowTime >= LastTime + OneFrameCnt) {
+                Update();
+                Render();
+                LastTime = NowTime;
+            }
+        }
+    }
+   
+    if (PerformFlg == FALSE) timeEndPeriod(1);
 
     closesocket(sock);
     WSACleanup();
@@ -95,10 +118,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, WINDOW_WIDTH, WINDOW_HEIGHT, nullptr, nullptr, hInstance, nullptr);
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
+   if (!hWnd) return FALSE;
+  
+   HDC hdc = GetDC(hWnd);
+   memDC = CreateCompatibleDC(hdc);
+   hBitmap = CreateCompatibleBitmap(hdc, WINDOW_WIDTH/*MAP_WIDTH*/, WINDOW_HEIGHT/*MAP_HEIGHT*/);
+   SelectObject(memDC, (HBITMAP)hBitmap);
+   ReleaseDC(hWnd, hdc);
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
@@ -114,7 +140,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         case WM_CREATE:
             FORTEST();
-            Render();
             break;
         case WM_CHAR:
             if (wParam == VK_RETURN) {
@@ -135,7 +160,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (len == 12) break;
                 InputID[len++] = (TCHAR)wParam;
             }
-            Render();
             break;
         case WM_DESTROY:
             PostQuitMessage(0);
@@ -168,15 +192,11 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 void Update()
 {
     if (!isConnection) return;
-
 }
 
 void Render()
 {
     HDC hdc = GetDC(hWnd);
-    HDC memDC = CreateCompatibleDC(hdc);
-    HBITMAP hBitmap = CreateCompatibleBitmap(hdc, MAP_WIDTH, MAP_HEIGHT);
-    SelectObject(memDC, (HBITMAP)hBitmap);
     PatBlt(memDC, 0, 0, MAP_WIDTH, MAP_HEIGHT, WHITENESS);
 
     if (isConnection) {
@@ -201,6 +221,5 @@ void Render()
         BitBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memDC, 0, 0, SRCCOPY);
     }
 
-    DeleteDC(memDC);
     ReleaseDC(hWnd, hdc);
 }

@@ -1,13 +1,15 @@
 #include "pch.h"
 #include "GameObject.h"
 
+
+
 GameObject::GameObject()
 {
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> uid(0, 255);
+	std::random_device frd;
+	std::mt19937 fgen(frd());
+	std::uniform_int_distribution<> fuid(0, 255);
 	for (int i = 0; i < MAXFEED; ++i)
-		Brushes[i] = RGB(uid(gen), uid(gen), uid(gen));
+		Brushes[i] = RGB(fuid(fgen), fuid(fgen), fuid(fgen));
 }
 
 void GameObject::Update(const Feed* NewFeed)

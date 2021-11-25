@@ -2,8 +2,6 @@
 #include "Player.h"
 #pragma warning(disable : 4996)
 
-
-
 Player::Player()
 {
 	std::random_device rd;
@@ -20,6 +18,8 @@ Player::Player()
 
 void Player::Init(const char* InputID)
 {
+	std::random_device rd;
+	std::mt19937 gen(rd());
 	std::uniform_real_distribution<> urdw(10, MAP_WIDTH - 10);
 	std::uniform_real_distribution<> urdh(10, MAP_HEIGHT - 10);
 	strncpy(InfoData.ID, InputID, 12);

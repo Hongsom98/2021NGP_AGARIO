@@ -1,35 +1,21 @@
 #pragma once
-#include "framework.h"
+
 #define NICKNAME_ADD	10
 #define NICKNAME_USE	11
 #define NICKNAME_UNUSE	12
 #define MAXUSER			13
 
-#define PLAYERLIST		110
-#define GAMEOBJECTLIST	111
-#define GAMEOVER		113
+#define GAMEOBJECTLIST	110
+#define INPUTDATA		111
+#define GAMEOVER		112
 
-struct Feed
-{
-	float Center;
-	float Radiuse;
-};
-struct Trap
-{
-	float Center;
-	float Radius;
-};
-struct GameObject
-{
-	float Center;
-	float Radius;
-};
+#define TCPPORT			54321
 
 struct ClientLoginPacket
 {
 	char size;
 	char type;
-	char nickname[12];
+	char ID[12];
 };
 
 struct ClientLoginOKPacket
@@ -38,20 +24,20 @@ struct ClientLoginOKPacket
 	char type;
 };
 
-struct PlayerListPacket
+struct GameObejctPacket
 {
 	char size;
 	char type;
-	PlayerInfo Playerlists[3];
-	char rank[3];
+	PlayerInfo playerlist[3];
+	Feed feedlist[MAXFEED];
 };
 
-struct GameObjectListPacket
+struct PlayerInputPacket
 {
 	char size;
 	char type;
-	Feed FeedList[MAXFEED];
-	Trap TrapList[MAXTRAP];
+	POINT mousePos;
+	char keyState;
 };
 
 struct GameOverPacket
