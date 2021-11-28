@@ -53,7 +53,17 @@ int recvn(SOCKET s, char* buf, int len, int flags)
 
     return (len - left);
 }
+void SendInputData(POINT p, char Key = 'N')
+{
+    PlayerInputPacket temp;
+    temp.size = sizeof(PlayerInputPacket);
+    temp.type = INPUTDATA;
+    temp.mousePos = p;
+    temp.keyState = Key;
 
+    send(sock, (char*)&temp.type, sizeof(temp.type), 0);
+    send(sock, (char*)&temp, sizeof(temp), 0);
+}
 void SendID(char* ID)
 {
 	int retval;
