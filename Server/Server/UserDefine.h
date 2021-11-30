@@ -20,7 +20,7 @@ struct PlayerInfo
 {
 	POINT Center;
 	float Radius;
-	char nickname[12]{ 0 };
+	char ID[12]{ 0 };
 	float Score;
 	COLORREF Color;
 };
