@@ -108,5 +108,14 @@ bool RecvIDCheck()
 
 void RecvObjects()
 {
+    GameObejctPacket temp;
 
+    int retval = recvn(sock, (char*)&temp, sizeof(ClientLoginOKPacket), 0);
+    if (retval == SOCKET_ERROR) {
+        err_display("recv()");
+        
+    }
+    GameObject* Obj;
+    Obj->Update(temp.feedlist);
+    
 }
