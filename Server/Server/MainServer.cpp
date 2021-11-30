@@ -6,8 +6,12 @@
 using namespace std;
 PlayerInfo Player[3];
 USHORT ClientPorts[3];
+Feed feedlist[MAXFEED];
 int nowID = 0;
-
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_real_distribution<> urdw(10, MAP_WIDTH - 10);
+std::uniform_real_distribution<> urdh(10, MAP_HEIGHT - 10);
 void SaveID(const char* NewID)
 {
     strncpy(Player[nowID].ID, NewID, strlen(NewID));
@@ -77,11 +81,18 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
 DWORD WINAPI ProcessUpdate(LPVOID arg)
 {
+
     return 0;
 }
 
 int main()
 {
+    for (int i = 0; i < MAXFEED; ++i)
+    {
+        feedlist[i].Center.x = urdw(gen);
+        feedlist[i].Center.y = urdh(gen);
+        feedlist[i].Radiuse = 10;
+    }
     int retval;
 
     WSADATA wsa;
