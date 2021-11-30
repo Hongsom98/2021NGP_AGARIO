@@ -1,35 +1,21 @@
 #pragma once
-#include "framework.h"
+
 #define NICKNAME_ADD	10
 #define NICKNAME_USE	11
 #define NICKNAME_UNUSE	12
 #define MAXUSER			13
 
-#define PLAYERLIST		110
-#define GAMEOBJECTLIST	111
-#define GAMEOVER		113
+#define GAMEOBJECTLIST	110
+#define INPUTDATA		111
+#define GAMEOVER		112
 
-struct Feed
-{
-	float Center;
-	float Radiuse;
-};
-struct Trap
-{
-	float Center;
-	float Radius;
-};
-struct GameObject
-{
-	float Center;
-	float Radius;
-};
+#define TCPPORT			54321
 
 struct ClientLoginPacket
 {
 	char size;
 	char type;
-	char nickname[12];
+	char ID[12];
 };
 
 struct ClientLoginOKPacket
@@ -38,20 +24,20 @@ struct ClientLoginOKPacket
 	char type;
 };
 
-struct PlayerListPacket
+struct GameObejctPacket
 {
 	char size;
 	char type;
-	PlayerInfo Playerlists[3];
-	char rank[3];
+	PlayerInfo playerlist[3];
+	Feed feedlist[MAXFEED];
 };
 
-struct GameObjectListPacket
+struct PlayerInputPacket
 {
 	char size;
 	char type;
-	Feed FeedList[MAXFEED];
-	Trap TrapList[MAXTRAP];
+	POINT mousePos;
+	char keyState;
 };
 
 struct GameOverPacket
@@ -59,3 +45,48 @@ struct GameOverPacket
 	char size;
 	char type;
 };
+
+
+void err_quit(const char* msg)
+{
+    LPVOID lpMsgBuf;
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+        NULL, WSAGetLastError(),
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR)&lpMsgBuf, 0, NULL);
+    MessageBox(NULL, (LPCTSTR)lpMsgBuf, msg, MB_ICONERROR);
+    LocalFree(lpMsgBuf);
+    exit(1);
+}
+
+void err_display(const char* msg)
+{
+    LPVOID lpMsgBuf;
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+        NULL, WSAGetLastError(),
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR)&lpMsgBuf, 0, NULL);
+    printf("[%s] %s", msg, (char*)lpMsgBuf);
+    LocalFree(lpMsgBuf);
+}
+
+int recvn(SOCKET s, char* buf, int len, int flags)
+{
+    int received;
+    char* ptr = buf;
+    int left = len;
+
+    while (left > 0) {
+        received = recv(s, ptr, left, flags);
+        if (received == SOCKET_ERROR)
+            return SOCKET_ERROR;
+        else if (received == 0)
+            break;
+        left -= received;
+        ptr += received;
+    }
+
+    return (len - left);
+}
