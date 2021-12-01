@@ -78,9 +78,14 @@ void PlayerMove(const Input& input)
     float Distance = sqrtf(powf(xVec, 2) + powf(yVec, 2));
     xVec /= Distance;
     yVec /= Distance;
+    xVec = round(xVec);
+    yVec = round(yVec);
     if (!input.ClientNum) cout << input.ClientNum << " : " << xVec << "  " << yVec << endl;
+    
     for (int i = 0; i < 4; ++i) {
+        
         if (Player[input.ClientNum].SellData[i].Radius) {
+            
             Player[input.ClientNum].SellData[i].Center.x += xVec * 1.0f;
             Player[input.ClientNum].SellData[i].Center.y += yVec * 1.0f;
         }
@@ -177,9 +182,9 @@ int main()
     {
         feed[i].Center.x = urdw(gen);
         feed[i].Center.y = urdh(gen);
-        feed[i].Radius = 1;
+        feed[i].Radius = 3;
     }
-
+    InitPlayers();
     int retval;
 
     WSADATA wsa;
