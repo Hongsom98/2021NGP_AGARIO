@@ -63,16 +63,15 @@ bool RecvIDCheck()
     return temp.type == NICKNAME_USE ? true : false;
 }
 
-void RecvObjects()
+void RecvObjectList()
 {
     GameObejctPacket temp;
 
-    int retval = recvn(sock, (char*)&temp, sizeof(ClientLoginOKPacket), 0);
+    int retval = recvn(sock, (char*)&temp, sizeof(GameObejctPacket), 0);
     if (retval == SOCKET_ERROR) {
         err_display("recv()");
-        
     }
+
     //GameObject* Obj;
     //Obj->Update(temp.feedlist);
-    
 }
