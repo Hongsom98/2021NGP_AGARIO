@@ -49,6 +49,25 @@ bool CheckID(const char* ID)
     return true;
 }
 
+void SendObjectList(SOCKET client_sock)
+{
+    GameObejctPacket temp;
+    temp.type = GAMEOBJECTLIST;
+    temp.size = sizeof(temp);
+
+    for (int i = 0; i < 3; ++i)
+    {
+        temp.playerlist[i] = Player[i];
+    }
+
+    for (int i = 0; i < MAXFEED; ++i)
+    {
+        temp.feedlist[i] = feedlist[i];
+    }
+
+    send(client_sock, (char*)&temp, sizeof(temp), 0);
+}
+
 DWORD WINAPI ProcessClient(LPVOID arg)
 {
     SOCKET client_sock = (SOCKET)arg;
