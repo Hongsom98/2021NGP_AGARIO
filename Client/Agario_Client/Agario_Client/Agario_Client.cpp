@@ -184,6 +184,8 @@ void Update()
     if (!isConnection) return;
 
     GetCursorPos(&Mouse);
+    ScreenToClient(hWnd, &Mouse);
+
     if (GetKeyState(0x5A) & 0x8000)
     {
         SendInputData(Mouse, 'z');
@@ -199,7 +201,7 @@ void Update()
     }
 
     GameObejctPacket packet = RecvObjects();
-    for (int i = 0; i < 3; ++i) player[i].Update(packet.playerlist[i]);
+    for (int i = 0; i < CLIENT; ++i) player[i].Update(packet.playerlist[i]);
     feeds.Update(packet.feedlist);
 }
 
@@ -210,10 +212,10 @@ void Render()
 
     if (isConnection) {
         map.Draw(memDC);
-        for(int i = 0 ; i < 3; ++i) player[i].Draw(memDC);
+        for(int i = 0 ; i < CLIENT; ++i) player[i].Draw(memDC);
         feeds.Draw(memDC);
 
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < CLIENT; ++i) {
             if (strncmp(InputID, player[i].GetID(), 12)) {
                 POINT playerCenter = player[i].GetCenter();
                 StretchBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memDC,

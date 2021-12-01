@@ -4,7 +4,7 @@
 #define WINDOW_HEIGHT	800
 
 #define MAXFEED			300
-
+#define CLIENT			3
 struct Feed
 {
 	POINT Center;

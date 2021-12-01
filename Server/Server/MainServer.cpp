@@ -63,9 +63,9 @@ void PlayerMove(const Input& input)
     float xVec = (input.mousePos.x - WINDOW_WIDTH / 2) - Player[input.ClientNum].SellData[0].Center.x;
     float yVec = (input.mousePos.y - WINDOW_HEIGHT / 2) - Player[input.ClientNum].SellData[0].Center.y;
     float Distance = sqrtf(powf(xVec, 2)) + sqrtf(powf(yVec, 2));
-    xVec = xVec / Distance;
-    yVec = yVec / Distance;
-    cout << input.ClientNum << " : " << xVec << "  " << yVec << endl;
+    xVec /= Distance;
+    yVec /= Distance;
+    //cout << input.ClientNum << " : " << xVec << "  " << yVec << endl;
     for (int i = 0; i < 4; ++i) {
         if (Player[input.ClientNum].SellData[i].Radius) {
             Player[input.ClientNum].SellData[i].Center.x += xVec * 1.0f;
@@ -96,7 +96,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
     while (true) {
         WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
-        cout << "쓰레드 동작 : " << ClientNum << endl;
+
         retval = recvn(client_sock, (char*)&type, sizeof(type), 0);
         if (retval == SOCKET_ERROR) err_display("Client Thread Type recv()");
 
@@ -122,9 +122,8 @@ DWORD WINAPI ProcessClient(LPVOID arg)
         }
 
         if (ClientNum < 2) SetEvent(ClientEvent[ClientNum + 1]);
-        if (ClientNum == 2) 
-            SetEvent(UpdateEvent);
-        cout << "업데이트 쓰레드 대기" << endl;
+        if (ClientNum == 2) SetEvent(UpdateEvent);
+
         WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
         /*GameObejctPacket temp;
         temp.size = sizeof(GameObejctPacket); temp.type = GAMEOBJECTLIST;
@@ -143,17 +142,19 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
 DWORD WINAPI ProcessUpdate(LPVOID arg)
 {
-    WaitForSingleObject(UpdateEvent, INFINITE);
-    cout << "업데이트 쓰레드 동작" << endl;
-    while (!InputQueue.empty())
+    while (true)
     {
-        Input temp = InputQueue.front();
-        InputQueue.pop();
+        WaitForSingleObject(UpdateEvent, INFINITE);
+        while (!InputQueue.empty())
+        {
+            Input temp = InputQueue.front();
+            InputQueue.pop();
 
-        PlayerMove(temp);
+            PlayerMove(temp);
+        }
+        SetEvent(ClientEvent[0]);
     }
-    SetEvent(ClientEvent[0]);
-    cout << "업데이트 쓰레드 동작 끝" << endl;
+
     return 0;
 }
 
