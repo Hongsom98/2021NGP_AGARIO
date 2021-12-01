@@ -88,6 +88,42 @@ void SendObjectList(SOCKET client_sock)
     send(client_sock, (char*)&temp, sizeof(temp), 0);
 }
 
+BOOL isColidePlayerToPlayer(PlayerInfo Client, int ClientNum)
+{
+    //switch (ClientNum)
+    //{
+    //case 1:
+    //    if (sqrt(pow(Client.Center.x - Player[1].Center.x, 2) + pow(Client.Center.y - Player[1].Center.y, 2)) < Client.Radius + Player[1].Radius)
+    //    {
+
+    //    }
+    //    if (sqrt(pow(Client.Center.x - Player[2].Center.x, 2) + pow(Client.Center.y - Player[2].Center.y, 2)) < Client.Radius + Player[2].Radius) return true;
+    //    else return false;
+    //    break;
+    //case 2:
+    //    break;
+    //case 3:
+    //    break;
+    //default:
+    //    break;
+    //}
+}
+
+BOOL isColidePlayerToFeed(PlayerInfo Client)
+{
+    for (int i = 0; i < MAXFEED; ++i)
+    {
+        if (sqrt(pow(Client.Center.x - feedlist[i].Center.x, 2) + pow(Client.Center.y - feedlist[i].Center.y, 2)) < Client.Radius + feedlist[i].Radiuse)
+        {
+            Client.Radius += feedlist[i].Radiuse;
+            feedlist[i].Center.x = urdw(gen);
+            feedlist[i].Center.y = urdh(gen);
+
+            return true;
+        }
+    }
+}
+
 DWORD WINAPI ProcessClient(LPVOID arg)
 {
     SOCKET client_sock = (SOCKET)arg;
