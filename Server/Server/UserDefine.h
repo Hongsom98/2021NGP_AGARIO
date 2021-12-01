@@ -6,21 +6,29 @@
 
 #define MAXFEED			300
 
-#define MAP_WIDTH		2500
-#define MAP_HEIGHT		2500
-
-
 struct Feed
 {
 	POINT Center;
-	float Radiuse;
+	float Radius = 0;
+};
+
+struct CObject
+{
+	POINT Center;
+	float Radius = 0;
 };
 
 struct PlayerInfo
 {
-	POINT Center;
-	float Radius;
-	char ID[12]{ 0 };
-	float Score;
+	CObject SellData[4];
+	char ID[12];
+	float Score = 0;
 	COLORREF Color;
+};
+
+struct Input
+{
+	int ClientNum;
+	char InputKey;
+	POINT mousePos;
 };

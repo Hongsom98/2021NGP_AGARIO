@@ -7,6 +7,7 @@
 #include <cmath>
 #include <string.h>
 #include <wchar.h>
+#include <queue>
 #include <random>
 #include <math.h>
 #define _WINSOCK_DEPRECATED_NO_WARNINGS 

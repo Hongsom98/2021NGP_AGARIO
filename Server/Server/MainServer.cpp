@@ -5,16 +5,24 @@
 
 using namespace std;
 PlayerInfo Player[3];
+Feed feed[MAXFEED];
 USHORT ClientPorts[3];
-Feed feedlist[MAXFEED];
 int nowID = 0;
+HANDLE ClientEvent[3];
+HANDLE UpdateEvent;
+queue<Input> InputQueue;
 std::random_device rd;
 std::mt19937 gen(rd());
-std::uniform_real_distribution<> urdw(10, MAP_WIDTH - 10);
-std::uniform_real_distribution<> urdh(10, MAP_HEIGHT - 10);
+std::uniform_real_distribution<> urdw(10, WINDOW_WIDTH - 10);
+std::uniform_real_distribution<> urdh(10, WINDOW_HEIGHT - 10);
+std::uniform_int_distribution<> uidc(0, 255);
 
 void SaveID(const char* NewID)
 {
+    Player[nowID].SellData[0].Center.x = urdw(gen); 
+    Player[nowID].SellData[0].Center.y = urdw(gen); 
+    Player[nowID].SellData[0].Radius = 10;
+    Player[nowID].Color = RGB(uidc(gen), uidc(gen), uidc(gen));
     strncpy(Player[nowID].ID, NewID, strlen(NewID));
     nowID++;
 
@@ -42,31 +50,41 @@ bool CheckID(const char* ID)
     for (int i = 0; i < nowID; ++i)
     {
         if (strcmp(Player[i].ID, ID) == false) {
-            cout << "중복있음" << endl << endl;
+            cout << "중복있음" << endl;
             return false;
         }
     }
-    cout << "중복 없음" << endl << endl;
+    cout << "중복 없음" << endl;
     return true;
+}
+
+void PlayerMove(const Input& input)
+{
+    float xVec = (input.mousePos.x - WINDOW_WIDTH / 2) - Player[input.ClientNum].SellData[0].Center.x;
+    float yVec = (input.mousePos.y - WINDOW_HEIGHT / 2) - Player[input.ClientNum].SellData[0].Center.y;
+    float Distance = sqrtf(powf(xVec, 2)) + sqrtf(powf(yVec, 2));
+    xVec /= Distance;
+    yVec /= Distance;
+    //cout << input.ClientNum << " : " << xVec << "  " << yVec << endl;
+    for (int i = 0; i < 4; ++i) {
+        if (Player[input.ClientNum].SellData[i].Radius) {
+            Player[input.ClientNum].SellData[i].Center.x += xVec * 1.0f;
+            Player[input.ClientNum].SellData[i].Center.y += yVec * 1.0f;
+        }
+    }
 }
 
 void SendObjectList(SOCKET client_sock)
 {
+    int retval;
     GameObejctPacket temp;
     temp.type = GAMEOBJECTLIST;
     temp.size = sizeof(temp);
+    memcpy(temp.playerlist, Player, sizeof(PlayerInfo) * 3);
+    memcpy(temp.feedlist, feed, sizeof(Feed) * MAXFEED);
 
-    for (int i = 0; i < 3; ++i)
-    {
-        temp.playerlist[i] = Player[i];
-    }
-
-    for (int i = 0; i < MAXFEED; ++i)
-    {
-        temp.feedlist[i] = feedlist[i];
-    }
-
-    send(client_sock, (char*)&temp, sizeof(temp), 0);
+    retval = send(client_sock, (char*)&temp, sizeof(temp), 0);
+    if (retval == SOCKET_ERROR) err_display("Client Thread gobj send()");
 }
 
 BOOL isColidePlayerToPlayer(PlayerInfo Client, int ClientNum)
@@ -109,9 +127,12 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 {
     SOCKET client_sock = (SOCKET)arg;
     int retval;
+    int ClientNum = nowID;
     char type;
 
     while (true) {
+        WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
+
         retval = recvn(client_sock, (char*)&type, sizeof(type), 0);
         if (retval == SOCKET_ERROR) err_display("Client Thread Type recv()");
 
@@ -127,8 +148,28 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             }
                 break;
             case INPUTDATA:
+            {
+                PlayerInputPacket packet;
+                retval = recvn(client_sock, (char*)&packet, sizeof(packet), 0);
+                if (retval == SOCKET_ERROR) err_display("Client Thread Input recv()");
+                InputQueue.push({ ClientNum, packet.keyState, packet.mousePos });
+            }
                 break;
         }
+
+        if (ClientNum < 2) SetEvent(ClientEvent[ClientNum + 1]);
+        if (ClientNum == 2) SetEvent(UpdateEvent);
+
+        WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
+        /*GameObejctPacket temp;
+        temp.size = sizeof(GameObejctPacket); temp.type = GAMEOBJECTLIST;
+        memcpy(temp.playerlist, Player, sizeof(PlayerInfo) * 3);
+        memcpy(temp.feedlist, feed, sizeof(Feed) * MAXFEED);
+        retval = send(client_sock, (char*)&temp, sizeof(temp), 0);
+        if (retval == SOCKET_ERROR) err_display("Client Thread gobj send()");*/
+        SendObjectList(client_sock);
+
+        SetEvent(ClientEvent[(ClientNum + 1) % 3]);
     }
 
     closesocket(client_sock);
@@ -137,6 +178,18 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
 DWORD WINAPI ProcessUpdate(LPVOID arg)
 {
+    while (true)
+    {
+        WaitForSingleObject(UpdateEvent, INFINITE);
+        while (!InputQueue.empty())
+        {
+            Input temp = InputQueue.front();
+            InputQueue.pop();
+
+            PlayerMove(temp);
+        }
+        SetEvent(ClientEvent[0]);
+    }
 
     return 0;
 }
@@ -145,10 +198,11 @@ int main()
 {
     for (int i = 0; i < MAXFEED; ++i)
     {
-        feedlist[i].Center.x = urdw(gen);
-        feedlist[i].Center.y = urdh(gen);
-        feedlist[i].Radiuse = 10;
+        feed[i].Center.x = urdw(gen);
+        feed[i].Center.y = urdh(gen);
+        feed[i].Radius = 1;
     }
+
     int retval;
 
     WSADATA wsa;
@@ -171,6 +225,11 @@ int main()
     SOCKET client_sock;
     SOCKADDR_IN clientaddr;
     int addrlen;
+
+    ClientEvent[0] = CreateEvent(NULL, FALSE, TRUE, NULL);
+    ClientEvent[1] = CreateEvent(NULL, FALSE, FALSE, NULL);
+    ClientEvent[2] = CreateEvent(NULL, FALSE, FALSE, NULL);
+    UpdateEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
     HANDLE hThread;
     hThread = CreateThread(NULL, 0, ProcessUpdate, NULL, 0, NULL);

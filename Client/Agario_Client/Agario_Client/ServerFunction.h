@@ -1,13 +1,13 @@
 #pragma once
-#include "..\..\..\Server\Server\PacketDefine.h"
-#include <iostream>
-//#include "PacketDefine.h"
+#include "PacketDefine.h"
 #pragma warning(disable : 4996)
 
 WSADATA wsa;
 SOCKET sock;
 SOCKADDR_IN serveraddr;
-#define SERVERIP "112.152.55.39"
+
+//#define SERVERIP "112.152.55.39"
+#define SERVERIP "127.0.0.1"
 
 void SendInputData(POINT p, char Key = 'N')
 {
@@ -16,21 +16,20 @@ void SendInputData(POINT p, char Key = 'N')
     temp.type = INPUTDATA;
     temp.mousePos = p;
     temp.keyState = Key;
-
+    
     send(sock, (char*)&temp.type, sizeof(temp.type), 0);
     send(sock, (char*)&temp, sizeof(temp), 0);
 }
+
 void SendID(char* ID)
 {
 	int retval;
 
-    
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		exit(1);
 
 	sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock == INVALID_SOCKET)
-		err_quit("socket()");
+	if (sock == INVALID_SOCKET) err_quit("socket()");
 
 	ZeroMemory(&serveraddr, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
@@ -38,8 +37,7 @@ void SendID(char* ID)
 	serveraddr.sin_port = htons(TCPPORT);
 
 	retval = connect(sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
-	if (retval == SOCKET_ERROR)
-		err_quit("connect()");
+	if (retval == SOCKET_ERROR) err_quit("connect()");
 
     ClientLoginPacket temp;
     temp.size = sizeof(ClientLoginPacket);
@@ -63,7 +61,7 @@ bool RecvIDCheck()
     return temp.type == NICKNAME_USE ? true : false;
 }
 
-void RecvObjectList()
+GameObejctPacket RecvObjects()
 {
     GameObejctPacket temp;
 
@@ -71,7 +69,5 @@ void RecvObjectList()
     if (retval == SOCKET_ERROR) {
         err_display("recv()");
     }
-
-    //GameObject* Obj;
-    //Obj->Update(temp.feedlist);
+    return temp;
 }
