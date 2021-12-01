@@ -10,6 +10,12 @@
 //#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
 #define FPS 30
 
+//#ifdef UNICODE
+//#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+//#else
+//#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
+//#endif
+
 Player player;
 GameObject feeds;
 Map map;
@@ -19,9 +25,11 @@ bool isConnection{ false };
 HDC memDC;
 HBITMAP hBitmap;
 
+
+
 void FORTEST()
 {
-    player.Init("TEST");
+   
     Feed test[MAXFEED];
     test[0].Center = { 400,400 }; test[0].Radius = 10;
     test[1].Center = { 450,400 }; test[1].Radius = 10;
@@ -30,6 +38,7 @@ void FORTEST()
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow)
 {
+
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 

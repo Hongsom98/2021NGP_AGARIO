@@ -1,13 +1,13 @@
 #pragma once
 #include "..\..\..\Server\Server\PacketDefine.h"
+#include <iostream>
 //#include "PacketDefine.h"
 #pragma warning(disable : 4996)
 
 WSADATA wsa;
 SOCKET sock;
 SOCKADDR_IN serveraddr;
-
-#define SERVERIP "127.0.0.1"
+#define SERVERIP "112.152.55.39"
 
 void SendInputData(POINT p, char Key = 'N')
 {
@@ -24,6 +24,7 @@ void SendID(char* ID)
 {
 	int retval;
 
+    
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		exit(1);
 

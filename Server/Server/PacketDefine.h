@@ -9,7 +9,7 @@
 #define INPUTDATA		111
 #define GAMEOVER		112
 
-#define TCPPORT			54321
+#define TCPPORT			4000
 
 struct ClientLoginPacket
 {
