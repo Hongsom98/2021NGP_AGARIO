@@ -11,6 +11,10 @@ int nowID = 0;
 HANDLE ClientEvent[3];
 HANDLE UpdateEvent[3];
 queue<Input> InputQueue;
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_real_distribution<> urdw(10, MAP_WIDTH - 10);
+std::uniform_real_distribution<> urdh(10, MAP_HEIGHT - 10);
 
 void SaveID(const char* NewID)
 {
@@ -63,6 +67,25 @@ void PlayerMove(const Input& input)
             Player[input.ClientNum].SellData[i].Center.y += yVec * 1.0f;
         }
     }
+}
+
+void SendObjectList(SOCKET client_sock)
+{
+    GameObejctPacket temp;
+    temp.type = GAMEOBJECTLIST;
+    temp.size = sizeof(temp);
+
+    for (int i = 0; i < 3; ++i)
+    {
+        temp.playerlist[i] = Player[i];
+    }
+
+    for (int i = 0; i < MAXFEED; ++i)
+    {
+        temp.feedlist[i] = feedlist[i];
+    }
+
+    send(client_sock, (char*)&temp, sizeof(temp), 0);
 }
 
 DWORD WINAPI ProcessClient(LPVOID arg)
@@ -137,6 +160,12 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
 
 int main()
 {
+    for (int i = 0; i < MAXFEED; ++i)
+    {
+        feedlist[i].Center.x = urdw(gen);
+        feedlist[i].Center.y = urdh(gen);
+        feedlist[i].Radiuse = 10;
+    }
     int retval;
 
     WSADATA wsa;

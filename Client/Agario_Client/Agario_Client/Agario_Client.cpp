@@ -14,14 +14,17 @@ Player player;
 GameObject feeds;
 Map map;
 POINT camera{ 50, 50 };
+POINT Mouse;
 TCHAR InputID[12] = { 0 };
 bool isConnection{ false };
 HDC memDC;
 HBITMAP hBitmap;
 
+
+
 void FORTEST()
 {
-    player.Init("TEST");
+   
     Feed test[MAXFEED];
     test[0].Center = { 400,400 }; test[0].Radius = 1;
     test[1].Center = { 450,400 }; test[1].Radius = 1;
@@ -191,6 +194,22 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 void Update()
 {
+    GetCursorPos(&Mouse);
+    if (GetKeyState(0x5A) & 0x8000)
+    {
+        SendInputData(Mouse, 'z');
+        
+    }
+    else if (GetKeyState(0x58) & 0x8000)
+    {
+        SendInputData(Mouse, 'x');
+    }
+    else
+    {
+         SendInputData(Mouse);
+
+    }
+    
     if (!isConnection) return;
 }
 
