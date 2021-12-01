@@ -1,15 +1,14 @@
 #pragma once
 
-
 #define WINDOW_WIDTH	800
 #define WINDOW_HEIGHT	800
 
 #define MAXFEED			300
-
+#define CLIENT			3
 struct Feed
 {
 	POINT Center;
-	float Radius;
+	float Radius=0;
 };
 
 struct CObject

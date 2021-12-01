@@ -1,14 +1,14 @@
 #pragma once
-#include "..\..\..\Server\Server\PacketDefine.h"
-#include <iostream>
-//#include "PacketDefine.h"
+#include "PacketDefine.h"
 #pragma warning(disable : 4996)
 
 WSADATA wsa;
 SOCKET sock;
 SOCKADDR_IN serveraddr;
+
 //#define SERVERIP "112.152.55.39"
 #define SERVERIP "127.0.0.1"
+
 void SendInputData(POINT p, char Key = 'N')
 {
     PlayerInputPacket temp;
@@ -17,15 +17,14 @@ void SendInputData(POINT p, char Key = 'N')
     temp.mousePos = p;
     temp.keyState = Key;
     
-
     send(sock, (char*)&temp.type, sizeof(temp.type), 0);
     send(sock, (char*)&temp, sizeof(temp), 0);
 }
+
 void SendID(char* ID)
 {
 	int retval;
 
-    
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		exit(1);
 
@@ -62,16 +61,13 @@ bool RecvIDCheck()
     return temp.type == NICKNAME_USE ? true : false;
 }
 
-void RecvObjects()
+GameObejctPacket RecvObjects()
 {
     GameObejctPacket temp;
 
     int retval = recvn(sock, (char*)&temp, sizeof(GameObejctPacket), 0);
     if (retval == SOCKET_ERROR) {
         err_display("recv()");
-        
     }
-    //GameObject* Obj;
-    //Obj->Update(temp.feedlist);
-    
+    return temp;
 }

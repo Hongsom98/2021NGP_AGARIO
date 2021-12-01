@@ -14,7 +14,7 @@ GameObject::GameObject()
 
 void GameObject::Update(const Feed* NewFeed)
 {
-	memcpy(Data, NewFeed, sizeof(Data));
+	memcpy(Data, NewFeed, sizeof(Feed) * MAXFEED);
 }
 
 void GameObject::Draw(HDC hdc)
