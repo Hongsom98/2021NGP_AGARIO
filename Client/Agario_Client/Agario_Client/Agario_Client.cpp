@@ -13,7 +13,7 @@
 Player player;
 GameObject feeds;
 Map map;
-POINT camera{ 300, 300 };
+POINT camera{ 50, 50 };
 TCHAR InputID[12] = { 0 };
 bool isConnection{ false };
 HDC memDC;
@@ -23,8 +23,8 @@ void FORTEST()
 {
     player.Init("TEST");
     Feed test[MAXFEED];
-    test[0].Center = { 400,400 }; test[0].Radius = 10;
-    test[1].Center = { 450,400 }; test[1].Radius = 10;
+    test[0].Center = { 400,400 }; test[0].Radius = 1;
+    test[1].Center = { 450,400 }; test[1].Radius = 1;
     feeds.Update(test);
 }
 
@@ -197,7 +197,7 @@ void Update()
 void Render()
 {
     HDC hdc = GetDC(hWnd);
-    PatBlt(memDC, 0, 0, MAP_WIDTH, MAP_HEIGHT, WHITENESS);
+    PatBlt(memDC, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, WHITENESS);
 
     if (isConnection) {
         map.Draw(memDC);

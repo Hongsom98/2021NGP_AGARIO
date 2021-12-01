@@ -7,6 +7,7 @@
 #include <cmath>
 #include <string.h>
 #include <wchar.h>
+#include <queue>
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS 
 #pragma comment(lib, "ws2_32")

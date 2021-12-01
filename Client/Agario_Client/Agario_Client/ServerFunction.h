@@ -62,8 +62,7 @@ void SendID(char* ID)
 		exit(1);
 
 	sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock == INVALID_SOCKET)
-		err_quit("socket()");
+	if (sock == INVALID_SOCKET) err_quit("socket()");
 
 	ZeroMemory(&serveraddr, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
@@ -71,8 +70,7 @@ void SendID(char* ID)
 	serveraddr.sin_port = htons(TCPPORT);
 
 	retval = connect(sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
-	if (retval == SOCKET_ERROR)
-		err_quit("connect()");
+	if (retval == SOCKET_ERROR) err_quit("connect()");
 
     ClientLoginPacket temp;
     temp.size = sizeof(ClientLoginPacket);

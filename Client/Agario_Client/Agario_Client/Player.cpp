@@ -20,12 +20,12 @@ void Player::Init(const char* InputID)
 {
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_real_distribution<> urdw(10, MAP_WIDTH - 10);
-	std::uniform_real_distribution<> urdh(10, MAP_HEIGHT - 10);
+	std::uniform_real_distribution<> urdw(10, WINDOW_WIDTH - 10);
+	std::uniform_real_distribution<> urdh(10, WINDOW_HEIGHT - 10);
 	strncpy(InfoData.ID, InputID, 12);
 	InfoData.SellData[0].Center.x = 500; //urdw(gen)
 	InfoData.SellData[0].Center.y = 500; //urdh(gen)
-	InfoData.SellData[0].Radius = 50;
+	InfoData.SellData[0].Radius = 10;
 }
 
 void Player::Update(const PlayerInfo& NewData)
