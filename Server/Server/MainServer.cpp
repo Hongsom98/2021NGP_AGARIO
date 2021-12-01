@@ -90,6 +90,14 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             }
                 break;
             case INPUTDATA:
+            {
+                PlayerInputPacket temp;
+                retval = recvn(client_sock, (char*)&temp, sizeof(temp), 0);
+                if (retval == SOCKET_ERROR) err_display("Client Thread ID recv()");
+                cout << temp.keyState << endl;
+                cout << temp.mousePos.x << " " << temp.mousePos.y << endl;
+                //if (temp.keyState == 'z') cout << temp.keyState << endl;
+            }
                 break;
         }
     }
@@ -100,7 +108,10 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
 DWORD WINAPI ProcessUpdate(LPVOID arg)
 {
-
+    while (true) {
+        
+    }
+    
     return 0;
 }
 

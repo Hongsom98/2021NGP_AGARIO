@@ -152,10 +152,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             FORTEST();
             break;
         case WM_MOUSEMOVE:
-            Mouse.x = LOWORD(lParam);
-            Mouse.y = HIWORD(lParam);
-
-            SendInputData(Mouse);
+           
             break;
         case WM_CHAR:
             if (wParam == VK_RETURN) {
@@ -207,6 +204,23 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 void Update()
 {
+    GetCursorPos(&Mouse);
+    if (GetKeyState(0x5A) & 0x8000)
+    {
+        SendInputData(Mouse, 'z');
+        
+    }
+    else if (GetKeyState(0x58) & 0x8000)
+    {
+        SendInputData(Mouse, 'x');
+    }
+    else
+    {
+         SendInputData(Mouse);
+
+    }
+    std::cout << Mouse.x << " " << Mouse.y << std::endl;
+    
     if (!isConnection) return;
 }
 
