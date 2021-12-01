@@ -19,6 +19,7 @@
 Player player;
 GameObject feeds;
 Map map;
+POINT Mouse;
 POINT camera{ 300, 300 };
 TCHAR InputID[12] = { 0 };
 bool isConnection{ false };
@@ -149,6 +150,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         case WM_CREATE:
             FORTEST();
+            break;
+        case WM_MOUSEMOVE:
+            Mouse.x = LOWORD(lParam);
+            Mouse.y = HIWORD(lParam);
+
+            SendInputData(Mouse);
             break;
         case WM_CHAR:
             if (wParam == VK_RETURN) {
