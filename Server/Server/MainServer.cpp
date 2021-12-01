@@ -105,40 +105,44 @@ void SendObjectList(SOCKET client_sock)
     if (retval == SOCKET_ERROR) err_display("Client Thread gobj send()");
 }
 
-BOOL isColidePlayerToPlayer(PlayerInfo Client, int ClientNum)
-{
-    //switch (ClientNum)
-    //{
-    //case 1:
-    //    if (sqrt(pow(Client.Center.x - Player[1].Center.x, 2) + pow(Client.Center.y - Player[1].Center.y, 2)) < Client.Radius + Player[1].Radius)
-    //    {
-
-    //    }
-    //    if (sqrt(pow(Client.Center.x - Player[2].Center.x, 2) + pow(Client.Center.y - Player[2].Center.y, 2)) < Client.Radius + Player[2].Radius) return true;
-    //    else return false;
-    //    break;
-    //case 2:
-    //    break;
-    //case 3:
-    //    break;
-    //default:
-    //    break;
-    //}
-}
+//BOOL isColidePlayerToPlayer(PlayerInfo Client, int ClientNum)
+//{
+//    //switch (ClientNum)
+//    //{
+//    //case 1:
+//    //    if (sqrt(pow(Client.Center.x - Player[1].Center.x, 2) + pow(Client.Center.y - Player[1].Center.y, 2)) < Client.Radius + Player[1].Radius)
+//    //    {
+//
+//    //    }
+//    //    if (sqrt(pow(Client.Center.x - Player[2].Center.x, 2) + pow(Client.Center.y - Player[2].Center.y, 2)) < Client.Radius + Player[2].Radius) return true;
+//    //    else return false;
+//    //    break;
+//    //case 2:
+//    //    break;
+//    //case 3:
+//    //    break;
+//    //default:
+//    //    break;
+//    //}
+//}
 
 BOOL isColidePlayerToFeed(PlayerInfo Client)
 {
     for (int i = 0; i < MAXFEED; ++i)
     {
-        if (sqrt(pow(Client.Center.x - feedlist[i].Center.x, 2) + pow(Client.Center.y - feedlist[i].Center.y, 2)) < Client.Radius + feedlist[i].Radiuse)
-        {
-            Client.Radius += feedlist[i].Radiuse;
-            feedlist[i].Center.x = urdw(gen);
-            feedlist[i].Center.y = urdh(gen);
+        for (int j = 0; i < 4; ++j) {
+            if (sqrt(pow(Client.SellData[j].Center.x - feed[i].Center.x, 2) + pow(Client.SellData[j].Center.y - feed[i].Center.y, 2)) < Client.SellData[j].Radius + feed[i].Radius)
+            {
+                Client.SellData[j].Radius += feed[i].Radius;
+                feed[i].Center.x = urdw(gen);
+                feed[i].Center.y = urdh(gen);
 
-            return true;
+                return true;
+            }
         }
     }
+
+    return false;
 }
 
 DWORD WINAPI ProcessClient(LPVOID arg)
