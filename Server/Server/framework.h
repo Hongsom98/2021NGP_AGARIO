@@ -8,6 +8,7 @@
 #include <string.h>
 #include <wchar.h>
 #include <random>
+#include <math.h>
 #define _WINSOCK_DEPRECATED_NO_WARNINGS 
 #pragma comment(lib, "ws2_32")
 #pragma warning(disable:4996)
