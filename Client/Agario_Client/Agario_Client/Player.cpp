@@ -4,33 +4,19 @@
 
 Player::Player()
 {
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> uid(0, 255);
-	memset(InfoData.ID, 0, sizeof(InfoData.ID));
-	InfoData.Color = RGB(uid(gen), uid(gen), uid(gen));
-	InfoData.Score = 0;
-	for (int i = 0; i < 4; ++i) {
-		InfoData.SellData[i].Center = POINT{ 0,0 };
-		InfoData.SellData[i].Radius = -1;
-	}
+
 }
 
 void Player::Init(const char* InputID)
 {
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_real_distribution<> urdw(10, WINDOW_WIDTH - 10);
-	std::uniform_real_distribution<> urdh(10, WINDOW_HEIGHT - 10);
-	strncpy(InfoData.ID, InputID, 12);
-	InfoData.SellData[0].Center.x = 500; //urdw(gen)
-	InfoData.SellData[0].Center.y = 500; //urdh(gen)
-	InfoData.SellData[0].Radius = 10;
+
 }
 
 void Player::Update(const PlayerInfo& NewData)
 {
+	InfoData.Color = NewData.Color;
 	InfoData.Score = NewData.Score;
+	strcpy(InfoData.ID, NewData.ID);
 	memcpy(InfoData.SellData, NewData.SellData, sizeof(InfoData.SellData));
 }
 
@@ -56,7 +42,6 @@ void Player::Draw(HDC hdc)
 		InfoData.ID, lstrlen(InfoData.ID));
 	SelectObject(hdc, oldpen);
 	DeleteObject(hpen);
-	
 }
 
 POINT Player::GetCenter()

@@ -6,30 +6,17 @@
 #include "Player.h"
 #include "GameObject.h"
 #include "Map.h"
-//#include <iostream>
-//#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
 #define FPS 30
 
-Player player;
+Player player[3];
 GameObject feeds;
 Map map;
 POINT camera{ 50, 50 };
-POINT Mouse;
+POINT Mouse{ 0,0 };
 TCHAR InputID[12] = { 0 };
 bool isConnection{ false };
 HDC memDC;
 HBITMAP hBitmap;
-
-
-
-void FORTEST()
-{
-   
-    Feed test[MAXFEED];
-    test[0].Center = { 400,400 }; test[0].Radius = 1;
-    test[1].Center = { 450,400 }; test[1].Radius = 1;
-    feeds.Update(test);
-}
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow)
 {
@@ -125,7 +112,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
   
    HDC hdc = GetDC(hWnd);
    memDC = CreateCompatibleDC(hdc);
-   hBitmap = CreateCompatibleBitmap(hdc, WINDOW_WIDTH/*MAP_WIDTH*/, WINDOW_HEIGHT/*MAP_HEIGHT*/);
+   hBitmap = CreateCompatibleBitmap(hdc, WINDOW_WIDTH, WINDOW_HEIGHT);
    SelectObject(memDC, (HBITMAP)hBitmap);
    ReleaseDC(hWnd, hdc);
 
@@ -142,9 +129,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
         case WM_CREATE:
-            FORTEST();
             break;
         case WM_CHAR:
+            if (wParam == VK_ESCAPE) exit(0);
             if (wParam == VK_RETURN) {
                 if (!isConnection) {
                     SendID(InputID);
@@ -194,6 +181,8 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 void Update()
 {
+    if (!isConnection) return;
+
     GetCursorPos(&Mouse);
     if (GetKeyState(0x5A) & 0x8000)
     {
@@ -206,11 +195,12 @@ void Update()
     }
     else
     {
-         SendInputData(Mouse);
-
+        SendInputData(Mouse);
     }
-    
-    if (!isConnection) return;
+
+    GameObejctPacket packet = RecvObjects();
+    for (int i = 0; i < 3; ++i) player[i].Update(packet.playerlist[i]);
+    feeds.Update(packet.feedlist);
 }
 
 void Render()
@@ -220,13 +210,18 @@ void Render()
 
     if (isConnection) {
         map.Draw(memDC);
-        player.Draw(memDC);
+        for(int i = 0 ; i < 3; ++i) player[i].Draw(memDC);
         feeds.Draw(memDC);
 
-        POINT playerCenter = player.GetCenter();
-        StretchBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memDC,
-            playerCenter.x - camera.x, playerCenter.y - camera.y,
-            camera.x * 2, camera.y * 2, SRCCOPY);
+        for (int i = 0; i < 3; ++i) {
+            if (strncmp(InputID, player[i].GetID(), 12)) {
+                POINT playerCenter = player[i].GetCenter();
+                StretchBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memDC,
+                    playerCenter.x - camera.x, playerCenter.y - camera.y,
+                    camera.x * 2, camera.y * 2, SRCCOPY);
+                break;
+            }
+        }
     }
     else {
         HPEN hpen = (HPEN)CreatePen(PS_SOLID, 3, RGB(0, 0, 0));

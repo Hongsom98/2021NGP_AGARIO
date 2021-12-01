@@ -9,7 +9,7 @@
 struct Feed
 {
 	POINT Center;
-	float Radiuse;
+	float Radius = 0;
 };
 
 struct CObject
@@ -22,7 +22,7 @@ struct PlayerInfo
 {
 	CObject SellData[4];
 	char ID[12];
-	float Score;
+	float Score = 0;
 	COLORREF Color;
 };
 

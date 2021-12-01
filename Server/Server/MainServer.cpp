@@ -9,15 +9,20 @@ Feed feed[MAXFEED];
 USHORT ClientPorts[3];
 int nowID = 0;
 HANDLE ClientEvent[3];
-HANDLE UpdateEvent[3];
+HANDLE UpdateEvent;
 queue<Input> InputQueue;
 std::random_device rd;
 std::mt19937 gen(rd());
-std::uniform_real_distribution<> urdw(10, MAP_WIDTH - 10);
-std::uniform_real_distribution<> urdh(10, MAP_HEIGHT - 10);
+std::uniform_real_distribution<> urdw(10, WINDOW_WIDTH - 10);
+std::uniform_real_distribution<> urdh(10, WINDOW_HEIGHT - 10);
+std::uniform_int_distribution<> uidc(0, 255);
 
 void SaveID(const char* NewID)
 {
+    Player[nowID].SellData[0].Center.x = urdw(gen); 
+    Player[nowID].SellData[0].Center.y = urdw(gen); 
+    Player[nowID].SellData[0].Radius = 10;
+    Player[nowID].Color = RGB(uidc(gen), uidc(gen), uidc(gen));
     strncpy(Player[nowID].ID, NewID, strlen(NewID));
     nowID++;
 
@@ -71,21 +76,15 @@ void PlayerMove(const Input& input)
 
 void SendObjectList(SOCKET client_sock)
 {
+    int retval;
     GameObejctPacket temp;
     temp.type = GAMEOBJECTLIST;
     temp.size = sizeof(temp);
+    memcpy(temp.playerlist, Player, sizeof(PlayerInfo) * 3);
+    memcpy(temp.feedlist, feed, sizeof(Feed) * MAXFEED);
 
-    for (int i = 0; i < 3; ++i)
-    {
-        temp.playerlist[i] = Player[i];
-    }
-
-    for (int i = 0; i < MAXFEED; ++i)
-    {
-        temp.feedlist[i] = feedlist[i];
-    }
-
-    send(client_sock, (char*)&temp, sizeof(temp), 0);
+    retval = send(client_sock, (char*)&temp, sizeof(temp), 0);
+    if (retval == SOCKET_ERROR) err_display("Client Thread gobj send()");
 }
 
 DWORD WINAPI ProcessClient(LPVOID arg)
@@ -122,17 +121,19 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                 break;
         }
 
-        SetEvent(UpdateEvent[ClientNum]);
         if (ClientNum < 2) SetEvent(ClientEvent[ClientNum + 1]);
-        
+        if (ClientNum == 2) 
+            SetEvent(UpdateEvent);
+        cout << "업데이트 쓰레드 대기" << endl;
         WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
-        GameObejctPacket temp;
+        /*GameObejctPacket temp;
         temp.size = sizeof(GameObejctPacket); temp.type = GAMEOBJECTLIST;
         memcpy(temp.playerlist, Player, sizeof(PlayerInfo) * 3);
         memcpy(temp.feedlist, feed, sizeof(Feed) * MAXFEED);
         retval = send(client_sock, (char*)&temp, sizeof(temp), 0);
-        if (retval == SOCKET_ERROR) err_display("Client Thread gobj send()");
-        
+        if (retval == SOCKET_ERROR) err_display("Client Thread gobj send()");*/
+        SendObjectList(client_sock);
+
         SetEvent(ClientEvent[(ClientNum + 1) % 3]);
     }
 
@@ -142,7 +143,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
 DWORD WINAPI ProcessUpdate(LPVOID arg)
 {
-    WaitForMultipleObjects(3, UpdateEvent, TRUE, INFINITE);
+    WaitForSingleObject(UpdateEvent, INFINITE);
     cout << "업데이트 쓰레드 동작" << endl;
     while (!InputQueue.empty())
     {
@@ -150,11 +151,9 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
         InputQueue.pop();
 
         PlayerMove(temp);
-        switch (temp.InputKey) {
-
-        }
     }
     SetEvent(ClientEvent[0]);
+    cout << "업데이트 쓰레드 동작 끝" << endl;
     return 0;
 }
 
@@ -162,10 +161,11 @@ int main()
 {
     for (int i = 0; i < MAXFEED; ++i)
     {
-        feedlist[i].Center.x = urdw(gen);
-        feedlist[i].Center.y = urdh(gen);
-        feedlist[i].Radiuse = 10;
+        feed[i].Center.x = urdw(gen);
+        feed[i].Center.y = urdh(gen);
+        feed[i].Radius = 1;
     }
+
     int retval;
 
     WSADATA wsa;
@@ -192,11 +192,7 @@ int main()
     ClientEvent[0] = CreateEvent(NULL, FALSE, TRUE, NULL);
     ClientEvent[1] = CreateEvent(NULL, FALSE, FALSE, NULL);
     ClientEvent[2] = CreateEvent(NULL, FALSE, FALSE, NULL);
-    UpdateEvent[0] = CreateEvent(NULL, FALSE, FALSE, NULL);
-    UpdateEvent[1] = CreateEvent(NULL, FALSE, FALSE, NULL);
-    UpdateEvent[2] = CreateEvent(NULL, FALSE, FALSE, NULL);
-
-
+    UpdateEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
     HANDLE hThread;
     hThread = CreateThread(NULL, 0, ProcessUpdate, NULL, 0, NULL);
