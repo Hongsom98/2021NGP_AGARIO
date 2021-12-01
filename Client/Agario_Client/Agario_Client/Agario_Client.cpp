@@ -216,7 +216,11 @@ void Render()
         feeds.Draw(memDC);
 
         for (int i = 0; i < CLIENT; ++i) {
-            if (strncmp(InputID, player[i].GetID(), 12)) {
+            if (!strncmp(InputID, player[i].GetID(), 12)) {
+                if(camera.x < camera.x + player[i].GetRadius() - 10.f)
+                    camera.x += player[i].GetRadius() - 10.f;
+                if (camera.y < camera.y + player[i].GetRadius() - 10.f)
+                    camera.y += player[i].GetRadius() - 10.f;
                 POINT playerCenter = player[i].GetCenter();
                 StretchBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memDC,
                     playerCenter.x - camera.x, playerCenter.y - camera.y,

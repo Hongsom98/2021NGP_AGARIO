@@ -49,6 +49,12 @@ POINT Player::GetCenter()
 	return InfoData.SellData[0].Center;
 }
 
+float Player::GetRadius()
+{
+
+	return InfoData.SellData[0].Radius;
+}
+
 TCHAR* Player::GetID()
 {
 	return (TCHAR*)InfoData.ID;

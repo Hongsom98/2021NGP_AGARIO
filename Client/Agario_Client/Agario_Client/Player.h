@@ -12,6 +12,7 @@ public:
 	void Init(const char* InputID);
 	void Update(const PlayerInfo& NewData);
 	void Draw(HDC hdc);
+	float GetRadius();
 	POINT GetCenter();
 	TCHAR* GetID();
 };

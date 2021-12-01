@@ -16,7 +16,7 @@ std::mt19937 gen(rd());
 std::uniform_real_distribution<> urdw(10, WINDOW_WIDTH - 10);
 std::uniform_real_distribution<> urdh(10, WINDOW_HEIGHT - 10);
 std::uniform_int_distribution<> uidc(0, 255);
-
+void isColidePlayerToFeed(PlayerInfo& Client);
 void InitPlayers()
 {
     Player[0].SellData[0].Center.x = 300;
@@ -90,6 +90,8 @@ void PlayerMove(const Input& input)
             Player[input.ClientNum].SellData[i].Center.y += yVec * 1.0f;
         }
     }
+    isColidePlayerToFeed(Player[input.ClientNum]);
+    
 }
 
 void SendObjectList(SOCKET client_sock)
@@ -126,23 +128,23 @@ void SendObjectList(SOCKET client_sock)
 //    //}
 //}
 
-BOOL isColidePlayerToFeed(PlayerInfo Client)
+void isColidePlayerToFeed(PlayerInfo& Client)
 {
     for (int i = 0; i < MAXFEED; ++i)
     {
-        for (int j = 0; i < 4; ++j) {
+        for (int j = 0; j < 4; ++j) {
             if (sqrt(pow(Client.SellData[j].Center.x - feed[i].Center.x, 2) + pow(Client.SellData[j].Center.y - feed[i].Center.y, 2)) < Client.SellData[j].Radius + feed[i].Radius)
             {
-                Client.SellData[j].Radius += feed[i].Radius;
+                Client.SellData[j].Radius += 1;
                 feed[i].Center.x = urdw(gen);
                 feed[i].Center.y = urdh(gen);
 
-                return true;
+                
             }
         }
     }
 
-    return false;
+    
 }
 
 DWORD WINAPI ProcessClient(LPVOID arg)
