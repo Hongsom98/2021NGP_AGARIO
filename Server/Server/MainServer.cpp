@@ -17,12 +17,24 @@ std::uniform_real_distribution<> urdw(10, WINDOW_WIDTH - 10);
 std::uniform_real_distribution<> urdh(10, WINDOW_HEIGHT - 10);
 std::uniform_int_distribution<> uidc(0, 255);
 
+void InitPlayers()
+{
+    Player[0].SellData[0].Center.x = 300;
+    Player[0].SellData[0].Center.y = 300;
+    Player[0].SellData[0].Radius = 10;
+    Player[0].Color = RGB(uidc(gen), uidc(gen), uidc(gen));
+    Player[1].SellData[0].Center.x = 400;
+    Player[1].SellData[0].Center.y = 400;
+    Player[1].SellData[0].Radius = 10;
+    Player[1].Color = RGB(uidc(gen), uidc(gen), uidc(gen));
+    Player[2].SellData[0].Center.x = 200;
+    Player[2].SellData[0].Center.y = 200;
+    Player[2].SellData[0].Radius = 10;
+    Player[2].Color = RGB(uidc(gen), uidc(gen), uidc(gen));
+}
+
 void SaveID(const char* NewID)
 {
-    Player[nowID].SellData[0].Center.x = urdw(gen); 
-    Player[nowID].SellData[0].Center.y = urdw(gen); 
-    Player[nowID].SellData[0].Radius = 10;
-    Player[nowID].Color = RGB(uidc(gen), uidc(gen), uidc(gen));
     strncpy(Player[nowID].ID, NewID, strlen(NewID));
     nowID++;
 
@@ -60,12 +72,13 @@ bool CheckID(const char* ID)
 
 void PlayerMove(const Input& input)
 {
+    if (!input.ClientNum) cout << input.mousePos.x << ", " << input.mousePos.y << endl;
     float xVec = (input.mousePos.x - WINDOW_WIDTH / 2) - Player[input.ClientNum].SellData[0].Center.x;
     float yVec = (input.mousePos.y - WINDOW_HEIGHT / 2) - Player[input.ClientNum].SellData[0].Center.y;
-    float Distance = sqrtf(powf(xVec, 2)) + sqrtf(powf(yVec, 2));
+    float Distance = sqrtf(powf(xVec, 2) + powf(yVec, 2));
     xVec /= Distance;
     yVec /= Distance;
-    //cout << input.ClientNum << " : " << xVec << "  " << yVec << endl;
+    if (!input.ClientNum) cout << input.ClientNum << " : " << xVec << "  " << yVec << endl;
     for (int i = 0; i < 4; ++i) {
         if (Player[input.ClientNum].SellData[i].Radius) {
             Player[input.ClientNum].SellData[i].Center.x += xVec * 1.0f;
