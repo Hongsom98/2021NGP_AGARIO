@@ -91,6 +91,7 @@ void PlayerMove(const Input& input)
             if (Player[input.ClientNum].SellData[i].Center.y > WINDOW_HEIGHT - 5) Player[input.ClientNum].SellData[i].Center.y = WINDOW_HEIGHT;
         }
     }
+
 }
 
 void SendObjectList(SOCKET client_sock)
@@ -106,26 +107,123 @@ void SendObjectList(SOCKET client_sock)
     if (retval == SOCKET_ERROR) err_display("Client Thread gobj send()");
 }
 
-//BOOL isColidePlayerToPlayer(PlayerInfo Client, int ClientNum)
-//{
-//    //switch (ClientNum)
-//    //{
-//    //case 1:
-//    //    if (sqrt(pow(Client.Center.x - Player[1].Center.x, 2) + pow(Client.Center.y - Player[1].Center.y, 2)) < Client.Radius + Player[1].Radius)
-//    //    {
-//
-//    //    }
-//    //    if (sqrt(pow(Client.Center.x - Player[2].Center.x, 2) + pow(Client.Center.y - Player[2].Center.y, 2)) < Client.Radius + Player[2].Radius) return true;
-//    //    else return false;
-//    //    break;
-//    //case 2:
-//    //    break;
-//    //case 3:
-//    //    break;
-//    //default:
-//    //    break;
-//    //}
-//}
+void isColidePlayerToPlayer(PlayerInfo& Client, int ClientNum)
+{
+    switch (ClientNum)
+    {
+    case 0:
+        if (sqrt(pow(Client.SellData[0].Center.x - Player[1].SellData[0].Center.x, 2) +
+            pow(Client.SellData[0].Center.y - Player[1].SellData[0].Center.y, 2))
+            < Client.SellData[0].Radius + Player[1].SellData[0].Radius)
+        {
+            if (Client.SellData[0].Radius < Player[1].SellData[0].Radius)
+            {
+                Player[1].SellData[0].Radius += Client.SellData[0].Radius;
+                Client.SellData[0].Radius = 0;
+                break;
+            }
+            else
+            {
+                Client.SellData[0].Radius += Player[1].SellData[0].Radius;
+                Player[1].SellData[0].Radius = 0;
+                break;
+            }
+        }
+        if (sqrt(pow(Client.SellData[0].Center.x - Player[2].SellData[0].Center.x, 2) +
+            pow(Client.SellData[0].Center.y - Player[2].SellData[0].Center.y, 2))
+            < Client.SellData[0].Radius + Player[2].SellData[0].Radius)
+        {
+            if (Client.SellData[0].Radius < Player[2].SellData[0].Radius)
+            {
+                Player[2].SellData[0].Radius += Client.SellData[0].Radius;
+                Client.SellData[0].Radius = 0;
+                break;
+            }
+            else
+            {
+                Client.SellData[0].Radius += Player[2].SellData[0].Radius;
+                Player[2].SellData[0].Radius = 0;
+                break;
+            }
+        }
+        break;
+    case 1:
+        if (sqrt(pow(Client.SellData[0].Center.x - Player[0].SellData[0].Center.x, 2) +
+            pow(Client.SellData[0].Center.y - Player[0].SellData[0].Center.y, 2))
+            < Client.SellData[0].Radius + Player[0].SellData[0].Radius)
+        {
+            if (Client.SellData[0].Radius < Player[0].SellData[0].Radius)
+            {
+                Player[0].SellData[0].Radius += Client.SellData[0].Radius;
+                Client.SellData[0].Radius = 0;
+                break;
+            }
+            else
+            {
+                Client.SellData[0].Radius += Player[0].SellData[0].Radius;
+                Player[0].SellData[0].Radius = 0;
+                break;
+            }
+        }
+        if (sqrt(pow(Client.SellData[0].Center.x - Player[2].SellData[0].Center.x, 2) +
+            pow(Client.SellData[0].Center.y - Player[2].SellData[0].Center.y, 2))
+            < Client.SellData[0].Radius + Player[2].SellData[0].Radius)
+        {
+            if (Client.SellData[0].Radius < Player[2].SellData[0].Radius)
+            {
+                Player[2].SellData[0].Radius += Client.SellData[0].Radius;
+                Client.SellData[0].Radius = 0;
+                break;
+            }
+            else
+            {
+                Client.SellData[0].Radius += Player[2].SellData[0].Radius;
+                Player[2].SellData[0].Radius = 0;
+                break;
+            }
+        }
+        break;
+    case 2:
+        if (sqrt(pow(Client.SellData[0].Center.x - Player[0].SellData[0].Center.x, 2) +
+            pow(Client.SellData[0].Center.y - Player[0].SellData[0].Center.y, 2))
+            < Client.SellData[0].Radius + Player[0].SellData[0].Radius)
+        {
+            if (Client.SellData[0].Radius < Player[0].SellData[0].Radius)
+            {
+                Player[0].SellData[0].Radius += Client.SellData[0].Radius;
+                Client.SellData[0].Radius = 0;
+                break;
+            }
+            else
+            {
+                Client.SellData[0].Radius += Player[0].SellData[0].Radius;
+                Player[0].SellData[0].Radius = 0;
+                break;
+            }
+        }
+        if (sqrt(pow(Client.SellData[0].Center.x - Player[1].SellData[0].Center.x, 2) +
+            pow(Client.SellData[0].Center.y - Player[1].SellData[0].Center.y, 2))
+            < Client.SellData[0].Radius + Player[1].SellData[0].Radius)
+        {
+            if (Client.SellData[0].Radius < Player[1].SellData[0].Radius)
+            {
+                Player[1].SellData[0].Radius += Client.SellData[0].Radius;
+                Client.SellData[0].Radius = 0;
+                break;
+            }
+            else
+            {
+                Client.SellData[0].Radius += Player[1].SellData[0].Radius;
+                Player[1].SellData[0].Radius = 0;
+                break;
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
+
 
 void isColidePlayerToFeed(PlayerInfo& Client)
 {
@@ -202,6 +300,7 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
 
             PlayerMove(temp);
             isColidePlayerToFeed(Player[temp.ClientNum]);
+            isColidePlayerToPlayer(Player[temp.ClientNum], temp.ClientNum);
         }
         SetEvent(ClientEvent[0]);
     }
