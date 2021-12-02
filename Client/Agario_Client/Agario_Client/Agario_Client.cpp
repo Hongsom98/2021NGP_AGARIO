@@ -16,6 +16,7 @@ POINT Mouse{ 0,0 };
 TCHAR InputID[12] = { 0 };
 bool isConnection{ false };
 HDC memDC;
+RECT ClientRect;
 HBITMAP hBitmap;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow)
@@ -129,6 +130,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
         case WM_CREATE:
+            GetClientRect(hWnd, &ClientRect);
             break;
         case WM_CHAR:
             if (wParam == VK_ESCAPE) exit(0);
@@ -209,7 +211,6 @@ void Render()
 {
     HDC hdc = GetDC(hWnd);
     PatBlt(memDC, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, WHITENESS);
-    //PatBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, WHITENESS);
 
     if (isConnection) {
         map.Draw(memDC);
@@ -218,8 +219,9 @@ void Render()
 
         for (int i = 0; i < CLIENT; ++i) {
             if (!strcmp(InputID, player[i].GetID())) {
-                StretchBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memDC,
-                    0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, SRCCOPY);
+                BitBlt(hdc, 0, 0, ClientRect.right, ClientRect.bottom, memDC, 0, 0, SRCCOPY);
+                //StretchBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memDC,
+                //    0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, SRCCOPY);
                 break;
             }
         }

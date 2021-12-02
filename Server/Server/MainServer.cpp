@@ -73,23 +73,22 @@ bool CheckID(const char* ID)
 
 void PlayerMove(const Input& input)
 {
-    float xVec = (input.mousePos.x - WINDOW_WIDTH / 2) - Player[input.ClientNum].SellData[0].Center.x;
-    float yVec = (input.mousePos.y - WINDOW_HEIGHT / 2) - Player[input.ClientNum].SellData[0].Center.y;
+    float xVec = input.mousePos.x - Player[input.ClientNum].SellData[0].Center.x;
+    float yVec = input.mousePos.y - Player[input.ClientNum].SellData[0].Center.y;
     float Distance = sqrtf(powf(xVec, 2) + powf(yVec, 2));
     xVec /= Distance;
     yVec /= Distance;
-    xVec = round(xVec);
-    yVec = round(yVec);
+    /*xVec = round(xVec);
+    yVec = round(yVec);*/
 
     for (int i = 0; i < 4; ++i) {
-        
-        if (Player[input.ClientNum].SellData[i].Radius) {
-            Player[input.ClientNum].SellData[i].Center.x += xVec * 1.0f;
-            if (Player[input.ClientNum].SellData[i].Center.x < 0) Player[input.ClientNum].SellData[i].Center.x = 0;
-            if (Player[input.ClientNum].SellData[i].Center.x > WINDOW_WIDTH) Player[input.ClientNum].SellData[i].Center.x = WINDOW_WIDTH;
-            Player[input.ClientNum].SellData[i].Center.y += yVec * 1.0f;
+        if (Player[input.ClientNum].SellData[i].Radius > 0) {
+            Player[input.ClientNum].SellData[i].Center.x += xVec * 2.0f;
+            if (Player[input.ClientNum].SellData[i].Center.x < 0)  Player[input.ClientNum].SellData[i].Center.x = 0;
+            if (Player[input.ClientNum].SellData[i].Center.x > WINDOW_WIDTH - 5) Player[input.ClientNum].SellData[i].Center.x = WINDOW_WIDTH;
+            Player[input.ClientNum].SellData[i].Center.y += yVec * 2.0f;
             if (Player[input.ClientNum].SellData[i].Center.y < 0) Player[input.ClientNum].SellData[i].Center.y = 0;
-            if (Player[input.ClientNum].SellData[i].Center.y > WINDOW_HEIGHT) Player[input.ClientNum].SellData[i].Center.y = WINDOW_HEIGHT;
+            if (Player[input.ClientNum].SellData[i].Center.y > WINDOW_HEIGHT - 5) Player[input.ClientNum].SellData[i].Center.y = WINDOW_HEIGHT;
         }
     }
 }
