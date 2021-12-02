@@ -134,7 +134,7 @@ void isColidePlayerToFeed(PlayerInfo& Client)
         for (int j = 0; j < 4; ++j) {
             if (sqrt(pow(Client.SellData[j].Center.x - feed[i].Center.x, 2) + pow(Client.SellData[j].Center.y - feed[i].Center.y, 2)) < Client.SellData[j].Radius + feed[i].Radius)
             {
-                Client.SellData[j].Radius += 1;
+                Client.SellData[j].Radius += 0.3;
                 Client.Score += 1;
                 feed[i].Center.x = urdw(gen);
                 feed[i].Center.y = urdh(gen);
