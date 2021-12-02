@@ -59,3 +59,8 @@ TCHAR* Player::GetID()
 {
 	return (TCHAR*)InfoData.ID;
 }
+
+int Player::GetScore()
+{
+	return InfoData.Score;
+}

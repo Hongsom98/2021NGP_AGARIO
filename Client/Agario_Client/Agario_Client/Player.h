@@ -15,4 +15,5 @@ public:
 	float GetRadius();
 	POINT GetCenter();
 	TCHAR* GetID();
+	int GetScore();
 };

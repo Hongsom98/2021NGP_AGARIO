@@ -209,6 +209,7 @@ void Render()
 {
     HDC hdc = GetDC(hWnd);
     PatBlt(memDC, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, WHITENESS);
+    //PatBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, WHITENESS);
 
     if (isConnection) {
         map.Draw(memDC);
@@ -216,15 +217,9 @@ void Render()
         feeds.Draw(memDC);
 
         for (int i = 0; i < CLIENT; ++i) {
-            if (!strncmp(InputID, player[i].GetID(), 12)) {
-               if(camera.x - player[i].GetRadius() < 40)
-                    camera.x += 1;
-               if (camera.y - player[i].GetRadius() < 40)
-                   camera.y += 1;
-                POINT playerCenter = player[i].GetCenter();
+            if (!strcmp(InputID, player[i].GetID())) {
                 StretchBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memDC,
-                    playerCenter.x - camera.x, playerCenter.y - camera.y,
-                    camera.x * 2, camera.y * 2, SRCCOPY);
+                    0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, SRCCOPY);
                 break;
             }
         }
