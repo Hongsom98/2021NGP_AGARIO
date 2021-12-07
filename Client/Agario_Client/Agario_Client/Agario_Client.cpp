@@ -217,14 +217,7 @@ void Render()
         for(int i = 0 ; i < CLIENT; ++i) player[i].Draw(memDC);
         feeds.Draw(memDC);
 
-        for (int i = 0; i < CLIENT; ++i) {
-            if (!strcmp(InputID, player[i].GetID())) {
-                BitBlt(hdc, 0, 0, ClientRect.right, ClientRect.bottom, memDC, 0, 0, SRCCOPY);
-                //StretchBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memDC,
-                //    0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, SRCCOPY);
-                break;
-            }
-        }
+        BitBlt(hdc, 0, 0, ClientRect.right, ClientRect.bottom, memDC, 0, 0, SRCCOPY);
     }
     else {
         HPEN hpen = (HPEN)CreatePen(PS_SOLID, 3, RGB(0, 0, 0));
