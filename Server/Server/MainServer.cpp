@@ -242,6 +242,17 @@ void isColidePlayerToFeed(PlayerInfo& Client)
     }
 }
 
+void PlayerDevide(PlayerInfo& Client, const Input& input)
+{
+    if (Client.SellData[0].Radius >= 6.0f)
+    {
+        float Half_Radius = Client.SellData[0].Radius / 2;
+        Client.SellData[0].Radius = Half_Radius;
+        Client.SellData[1].Center.x = Player[input.ClientNum].SellData[0].Center.x + (2 * Half_Radius);
+        Client.SellData[1].Center.y = Player[input.ClientNum].SellData[0].Center.y;
+        Client.SellData[1].Radius = Half_Radius;
+    }
+}
 
 DWORD WINAPI ProcessClient(LPVOID arg)
 {
@@ -271,6 +282,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             {
                 PlayerInputPacket packet;
                 retval = recvn(client_sock, (char*)&packet, sizeof(packet), 0);
+                cout << ClientNum << "¹ø : " << packet.keyState << endl;
                 if (retval == SOCKET_ERROR) err_display("Client Thread Input recv()");
                 InputQueue.push({ ClientNum, packet.keyState, packet.mousePos });
             }
@@ -301,6 +313,7 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
             InputQueue.pop();
 
             PlayerMove(temp);
+            if (temp.InputKey == 'x') PlayerDevide(Player[temp.ClientNum],temp);
             isColidePlayerToFeed(Player[temp.ClientNum]);
             isColidePlayerToPlayer(Player[temp.ClientNum], temp.ClientNum);
         }

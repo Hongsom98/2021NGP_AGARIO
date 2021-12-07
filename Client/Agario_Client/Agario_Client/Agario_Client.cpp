@@ -149,7 +149,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 InputID[--len] = 0;
             }
             else {
-                if (len == 12) break;
+                if (len == 12 || isConnection) break;
                 InputID[len++] = (TCHAR)wParam;
             }
             break;
