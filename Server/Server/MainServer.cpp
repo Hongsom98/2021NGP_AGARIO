@@ -74,26 +74,25 @@ bool CheckID(const char* ID)
 
 void PlayerMove(const Input& input)
 {
-    if (!input.ClientNum) cout << input.mousePos.x << ", " << input.mousePos.y << endl;
-    float xVec = (input.mousePos.x - WINDOW_WIDTH / 2) - Player[input.ClientNum].SellData[0].Center.x;
-    float yVec = (input.mousePos.y - WINDOW_HEIGHT / 2) - Player[input.ClientNum].SellData[0].Center.y;
+    float xVec = input.mousePos.x - Player[input.ClientNum].SellData[0].Center.x;
+    float yVec = input.mousePos.y - Player[input.ClientNum].SellData[0].Center.y;
     float Distance = sqrtf(powf(xVec, 2) + powf(yVec, 2));
     xVec /= Distance;
     yVec /= Distance;
-    xVec = round(xVec);
-    yVec = round(yVec);
-    if (!input.ClientNum) cout << input.ClientNum << " : " << xVec << "  " << yVec << endl;
-    
+    /*xVec = round(xVec);
+    yVec = round(yVec);*/
+
     for (int i = 0; i < 4; ++i) {
-        
-        if (Player[input.ClientNum].SellData[i].Radius) {
-            
-            Player[input.ClientNum].SellData[i].Center.x += xVec * 1.0f;
-            Player[input.ClientNum].SellData[i].Center.y += yVec * 1.0f;
+        if (Player[input.ClientNum].SellData[i].Radius > 0) {
+            Player[input.ClientNum].SellData[i].Center.x += xVec * 2.0f;
+            if (Player[input.ClientNum].SellData[i].Center.x < 0)  Player[input.ClientNum].SellData[i].Center.x = 0;
+            if (Player[input.ClientNum].SellData[i].Center.x > WINDOW_WIDTH - 5) Player[input.ClientNum].SellData[i].Center.x = WINDOW_WIDTH;
+            Player[input.ClientNum].SellData[i].Center.y += yVec * 2.0f;
+            if (Player[input.ClientNum].SellData[i].Center.y < 0) Player[input.ClientNum].SellData[i].Center.y = 0;
+            if (Player[input.ClientNum].SellData[i].Center.y > WINDOW_HEIGHT - 5) Player[input.ClientNum].SellData[i].Center.y = WINDOW_HEIGHT;
         }
     }
-    //isColidePlayerToFeed(Player[input.ClientNum]);
-    isColidePlayerToPlayer(Player[input.ClientNum], input.ClientNum);
+
 }
 
 void SendObjectList(SOCKET client_sock)
@@ -226,6 +225,7 @@ void isColidePlayerToPlayer(PlayerInfo& Client, int ClientNum)
     }
 }
 
+
 void isColidePlayerToFeed(PlayerInfo& Client)
 {
     for (int i = 0; i < MAXFEED; ++i)
@@ -233,16 +233,13 @@ void isColidePlayerToFeed(PlayerInfo& Client)
         for (int j = 0; j < 4; ++j) {
             if (sqrt(pow(Client.SellData[j].Center.x - feed[i].Center.x, 2) + pow(Client.SellData[j].Center.y - feed[i].Center.y, 2)) < Client.SellData[j].Radius + feed[i].Radius)
             {
-                Client.SellData[j].Radius += 1;
+                Client.SellData[j].Radius += 0.3;
+                Client.Score += 1;
                 feed[i].Center.x = urdw(gen);
                 feed[i].Center.y = urdh(gen);
-
-                
             }
         }
     }
-
-    
 }
 
 
@@ -284,12 +281,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
         if (ClientNum == 2) SetEvent(UpdateEvent);
 
         WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
-        /*GameObejctPacket temp;
-        temp.size = sizeof(GameObejctPacket); temp.type = GAMEOBJECTLIST;
-        memcpy(temp.playerlist, Player, sizeof(PlayerInfo) * 3);
-        memcpy(temp.feedlist, feed, sizeof(Feed) * MAXFEED);
-        retval = send(client_sock, (char*)&temp, sizeof(temp), 0);
-        if (retval == SOCKET_ERROR) err_display("Client Thread gobj send()");*/
         SendObjectList(client_sock);
 
         SetEvent(ClientEvent[(ClientNum + 1) % 3]);
@@ -310,6 +301,8 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
             InputQueue.pop();
 
             PlayerMove(temp);
+            isColidePlayerToFeed(Player[temp.ClientNum]);
+            isColidePlayerToPlayer(Player[temp.ClientNum], temp.ClientNum);
         }
         SetEvent(ClientEvent[0]);
     }
