@@ -11,6 +11,7 @@ USHORT ClientPorts[3];
 int nowID = 0;
 HANDLE ClientEvent[3];
 HANDLE UpdateEvent;
+TimeManager tm;
 queue<Input> InputQueue;
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -256,17 +257,32 @@ void isColidePlayerToFeed(PlayerInfo& Client)
     for (int i = 0; i < MAXFEED; ++i)
     {
         for (int j = 0; j < 4; ++j) {
-            if (sqrt(pow(Client.SellData[j].Center.x - feed[i].Center.x, 2) + pow(Client.SellData[j].Center.y - feed[i].Center.y, 2)) < Client.SellData[j].Radius + feed[i].Radius)
+            if (sqrt(pow(Client.SellData[j].Center.x - feed[i].Center.x, 2) + pow(Client.SellData[j].Center.y - feed[i].Center.y, 2)) < Client.SellData[j].Radius + feed[i].Radius && feed[i].Radius > 0)
             {
                 Client.SellData[j].Radius += 0.3;
                 Client.Score += 1;
-                feed[i].Center.x = urdw(gen);
-                feed[i].Center.y = urdh(gen);
+                feed[i].Radius = 0;
+
+                //feed[i].Center.x = urdw(gen);
+                //feed[i].Center.y = urdh(gen);
             }
         }
     }
 }
-
+void CreateNewFeed()
+{
+    for (int i = 0; i < MAXFEED; ++i)
+    {
+        
+        if (feed[i].Radius == 0)
+        {
+            feed[i].Radius = 3;
+            feed[i].Center.x = urdw(gen);
+            feed[i].Center.y = urdw(gen);
+            break;
+        }
+    }
+}
 void PlayerDevide(const Input& input)
 {
     if (Player[input.ClientNum].SellData[0].Radius >= 6.0f)
@@ -372,6 +388,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
 DWORD WINAPI ProcessUpdate(LPVOID arg)
 {
+    tm.SetPreTime();
     while (true)
     {
         WaitForSingleObject(UpdateEvent, INFINITE);
@@ -398,9 +415,21 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
             isColidePlayerToPlayer(Player[temp.ClientNum], temp.ClientNum);
             ColidePlayerToProjectile();
         }
+        
         SetEvent(ClientEvent[0]);
+        tm.SetCurTime();
+        if (tm.GetDeltaTime() > 0.3f)
+        {
+            double tmp = tm.GetDeltaTime();
+            for (auto i = tmp; i > 0.3;)
+            {
+                CreateNewFeed();
+                i -= 0.3;
+            }
+            tm.SetPreTime();
+        }
+        
     }
-
     return 0;
 }
 
