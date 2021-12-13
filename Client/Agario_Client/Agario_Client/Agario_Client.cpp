@@ -243,6 +243,21 @@ void Render()
         BitBlt(hdc, 0, 0, ClientRect.right, ClientRect.bottom, memDC, 0, 0, SRCCOPY);
     }
     else {
+        TCHAR Log[8] = "LOGIN :";
+        TextOut(memDC, WINDOW_WIDTH / 2-60 , WINDOW_HEIGHT / 2,
+            Log, lstrlen(Log));
+        MoveToEx(memDC, WINDOW_WIDTH / 2-70, WINDOW_HEIGHT / 2-10, NULL);
+        LineTo(memDC, WINDOW_WIDTH / 2-70, WINDOW_HEIGHT/2 + 30);
+        
+        MoveToEx(memDC, WINDOW_WIDTH / 2 - 70, WINDOW_HEIGHT / 2 - 10, NULL);
+        LineTo(memDC, WINDOW_WIDTH / 2 + 70, WINDOW_HEIGHT / 2 -10);
+
+        MoveToEx(memDC, WINDOW_WIDTH / 2 + 70, WINDOW_HEIGHT / 2 - 10, NULL);
+        LineTo(memDC, WINDOW_WIDTH / 2 + 70, WINDOW_HEIGHT / 2 + 30);
+
+        MoveToEx(memDC, WINDOW_WIDTH / 2 - 70, WINDOW_HEIGHT / 2 + 30, NULL);
+        LineTo(memDC, WINDOW_WIDTH / 2 + 70, WINDOW_HEIGHT / 2 + 30);
+
         HPEN hpen = (HPEN)CreatePen(PS_SOLID, 3, RGB(0, 0, 0));
         HPEN oldpen = (HPEN)SelectObject(hdc, hpen);
         SetBkMode(hdc, TRANSPARENT);
