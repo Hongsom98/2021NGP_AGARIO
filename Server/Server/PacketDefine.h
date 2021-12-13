@@ -13,37 +13,37 @@
 
 struct ClientLoginPacket
 {
-	char size;
 	char type;
+	char size;
 	char ID[12];
 };
 
 struct ClientLoginOKPacket
 {
-	char size;
 	char type;
+	char size;
 };
 
 struct GameObejctPacket
 {
-	char size;
 	char type;
+	char size;
 	PlayerInfo playerlist[3];
 	Feed feedlist[MAXFEED];
 };
 
 struct PlayerInputPacket
 {
-	char size;
 	char type;
+	char size;
 	POINT mousePos;
 	char keyState;
 };
 
 struct GameOverPacket
 {
-	char size;
 	char type;
+	char size;
 };
 
 
