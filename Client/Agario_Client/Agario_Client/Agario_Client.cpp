@@ -237,8 +237,8 @@ void Render()
 
     if (isConnection) {
         map.Draw(memDC);
-        for(int i = 0 ; i < CLIENT; ++i) player[i].Draw(memDC);
         feeds.Draw(memDC);
+        for(int i = 0 ; i < CLIENT; ++i) player[i].Draw(memDC);
 
         BitBlt(hdc, 0, 0, ClientRect.right, ClientRect.bottom, memDC, 0, 0, SRCCOPY);
     }

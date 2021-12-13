@@ -269,13 +269,11 @@ void isColidePlayerToFeed(PlayerInfo& Client)
                 Client.SellData[j].Radius += 0.3;
                 Client.Score += 1;
                 feed[i].Radius = 0;
-
-                //feed[i].Center.x = urdw(gen);
-                //feed[i].Center.y = urdh(gen);
             }
         }
     }
 }
+
 void CheckPlayerDevide()
 {
     for (int i = 0; i < 3; ++i)
@@ -289,6 +287,7 @@ void CheckPlayerDevide()
         }
     }
 }
+
 void CreateNewFeed()
 {
     for (int i = 0; i < MAXFEED; ++i)
@@ -330,7 +329,6 @@ void ColidePlayerToProjectile(int ClientNum)
                 {
                     if (Player[i].SellData[k].Radius) {
                         if (sqrt(pow(Player[i].SellData[k].Center.x - projectiles[j].Center.x, 2) + pow(Player[i].SellData[k].Center.y - projectiles[j].Center.y, 2)) < Player[i].SellData[k].Radius + 6) {
-                            cout << i << "번 클라와 충돌함" << endl;
                             if (Player[i].Color != projectiles[j].Color) Player[i].Score++;
                             Player[i].SellData[k].Radius += 6.f;
                             projectiles[j].Color = 0;
@@ -354,13 +352,12 @@ void SpitFeed(const Input& input)
                     float Distance = sqrtf(powf(xVec, 2) + powf(yVec, 2));
                     xVec /= Distance;
                     yVec /= Distance;
-                    projectiles[j].Center.x = Player[input.ClientNum].SellData[i].Center.x + xVec * 30.f;
-                    projectiles[j].Center.y = Player[input.ClientNum].SellData[i].Center.y + yVec * 30.f;
+                    projectiles[j].Center.x = Player[input.ClientNum].SellData[i].Center.x + xVec * 35.f;
+                    projectiles[j].Center.y = Player[input.ClientNum].SellData[i].Center.y + yVec * 35.f;
                     projectiles[j].Color = Player[input.ClientNum].Color;
                     projectiles[j].xSpeed = xVec;
                     projectiles[j].ySpeed = yVec;
                     Player[input.ClientNum].SellData[i].Radius -= 6;
-                    cout << input.ClientNum << "번 클라가 뱉음" << endl;
                     return;
                 }
             }

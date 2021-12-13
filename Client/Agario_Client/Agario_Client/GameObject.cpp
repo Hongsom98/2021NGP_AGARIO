@@ -15,24 +15,11 @@ GameObject::GameObject()
 void GameObject::Update(const Feed* NewFeed, const Projectile* NewProjectile)
 {
 	memcpy(Data, NewFeed, sizeof(Feed) * MAXFEED);
-	memcpy(Data, NewProjectile, sizeof(Projectile) * MAXPROJ);
+	memcpy(projectiles, NewProjectile, sizeof(Projectile) * MAXPROJ);
 }
 
 void GameObject::Draw(HDC hdc)
 {
-	for (int i = 0; i < MAXFEED; ++i)
-	{
-		HBRUSH myBrush = (HBRUSH)CreateSolidBrush(Brushes[i]);
-		HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, myBrush);
-		if (Data[i].Radius > 0)
-			Ellipse(hdc, Data[i].Center.x - Data[i].Radius,
-				Data[i].Center.y - Data[i].Radius,
-				Data[i].Center.x + Data[i].Radius,
-				Data[i].Center.y + Data[i].Radius);
-
-		SelectObject(hdc, oldBrush);
-		DeleteObject(myBrush);
-	}
 	for (int i = 0; i < MAXPROJ; ++i)
 	{
 		if (projectiles[i].Color) {
@@ -47,5 +34,18 @@ void GameObject::Draw(HDC hdc)
 			DeleteObject(myBrush);
 		}
 	}
-		
+
+	for (int i = 0; i < MAXFEED; ++i)
+	{
+		HBRUSH myBrush = (HBRUSH)CreateSolidBrush(Brushes[i]);
+		HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, myBrush);
+		if (Data[i].Radius > 0)
+			Ellipse(hdc, Data[i].Center.x - Data[i].Radius,
+				Data[i].Center.y - Data[i].Radius,
+				Data[i].Center.x + Data[i].Radius,
+				Data[i].Center.y + Data[i].Radius);
+
+		SelectObject(hdc, oldBrush);
+		DeleteObject(myBrush);
+	}
 }
