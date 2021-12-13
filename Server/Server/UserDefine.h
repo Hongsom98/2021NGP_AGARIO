@@ -22,7 +22,7 @@ struct PlayerInfo
 {
 	CObject SellData[4];
 	char ID[12];
-	float Score = 0;
+	float Score = 10;
 	COLORREF Color;
 };
 
