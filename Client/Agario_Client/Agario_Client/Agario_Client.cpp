@@ -11,13 +11,13 @@
 Player player[3];
 GameObject feeds;
 Map map;
-POINT camera{ 50, 50 };
 POINT Mouse{ 0,0 };
 TCHAR InputID[12] = { 0 };
 bool isConnection{ false };
 HDC memDC;
 RECT ClientRect;
 HBITMAP hBitmap;
+char test[50];
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow)
 {
@@ -34,12 +34,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
     MSG msg;
     memset(&msg, 0, sizeof(msg));
+
+    /*
     BOOL PerformFlg = FALSE;
     LONGLONG NowTime = 0;
     LONGLONG LastTime = 0;
     LONGLONG Frequency = 0;
     LONGLONG OneFrameCnt = 0;
-
     if (::QueryPerformanceFrequency((LARGE_INTEGER*)&Frequency)) {
         PerformFlg = TRUE;
         OneFrameCnt = Frequency / FPS;
@@ -51,8 +52,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         OneFrameCnt = 1000 / FPS;
         LastTime = (LONGLONG)::timeGetTime();
     }
-
-
     while (msg.message != WM_QUIT)
     {
         if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -72,8 +71,28 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
             }
         }
     }
-   
     if (PerformFlg == FALSE) timeEndPeriod(1);
+    */
+
+    int NowTime = 0;
+    int LastTime = GetTickCount64();
+    int FrameCnt = 1000 / FPS;
+
+    while (msg.message != WM_QUIT)
+    {
+        if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        else {
+            NowTime = GetTickCount64();
+            if (NowTime >= LastTime + FrameCnt) {
+                Update();
+                Render();
+                LastTime = NowTime;
+            }
+        }
+    }
 
     closesocket(sock);
     WSACleanup();
