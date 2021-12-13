@@ -12,9 +12,10 @@ GameObject::GameObject()
 		Brushes[i] = RGB(fuid(fgen), fuid(fgen), fuid(fgen));
 }
 
-void GameObject::Update(const Feed* NewFeed)
+void GameObject::Update(const Feed* NewFeed, const Projectile* NewProjectile)
 {
 	memcpy(Data, NewFeed, sizeof(Feed) * MAXFEED);
+	memcpy(Data, NewProjectile, sizeof(Projectile) * MAXPROJ);
 }
 
 void GameObject::Draw(HDC hdc)
@@ -31,6 +32,20 @@ void GameObject::Draw(HDC hdc)
 
 		SelectObject(hdc, oldBrush);
 		DeleteObject(myBrush);
+	}
+	for (int i = 0; i < MAXPROJ; ++i)
+	{
+		if (projectiles[i].Color) {
+			HBRUSH myBrush = (HBRUSH)CreateSolidBrush(projectiles[i].Color);
+			HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, myBrush);
+			Ellipse(hdc, projectiles[i].Center.x - projectiles[i].Radius,
+				projectiles[i].Center.y - projectiles[i].Radius,
+				projectiles[i].Center.x + projectiles[i].Radius,
+				projectiles[i].Center.y + projectiles[i].Radius);
+
+			SelectObject(hdc, oldBrush);
+			DeleteObject(myBrush);
+		}
 	}
 		
 }

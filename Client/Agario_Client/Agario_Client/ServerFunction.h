@@ -23,8 +23,12 @@ DWORD WINAPI RecvThread(LPVOID arg)
 
     while (true)
     {
+        if (!isConnection) continue;
         retval = recvn(sock, (char*)&type, sizeof(type), 0);
-        //if (retval == SOCKET_ERROR) Sleep(3000);
+        if (retval == SOCKET_ERROR) {
+            err_quit("RecvThread recv()");
+            break;
+        }
         
         switch (type)
         {
@@ -41,7 +45,7 @@ DWORD WINAPI RecvThread(LPVOID arg)
             GameObejctPacket packet;
             recvn(sock, (char*)&packet, sizeof(packet), 0);
             for (int i = 0; i < CLIENT; ++i) player[i].Update(packet.playerlist[i]);
-            feeds.Update(packet.feedlist);
+            feeds.Update(packet.feedlist, packet.projectile);
             break;
         }
 
@@ -49,6 +53,7 @@ DWORD WINAPI RecvThread(LPVOID arg)
         
     }
     closesocket(sock);
+    return 0;
 }
 
 void SendInputData(POINT p, char Key = 'N')
