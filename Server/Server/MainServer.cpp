@@ -50,10 +50,12 @@ void SendID_OK(bool duplicated, SOCKET client_sock, const char* NewID) {
     if (duplicated) {
         SaveID(NewID);
         packet.type = NICKNAME_USE;
+        retval = send(client_sock, (char*)&packet.type, sizeof(packet.type), 0);
         retval = send(client_sock, (char*)&packet, sizeof(packet),0);
     }
     else {
         packet.type = NICKNAME_UNUSE;
+        retval = send(client_sock, (char*)&packet.type, sizeof(packet.type), 0);
         retval = send(client_sock, (char*)&packet, sizeof(packet), 0);
     }
     if (retval == SOCKET_ERROR) err_display("Client Thread ID send()");
@@ -104,6 +106,7 @@ void SendObjectList(SOCKET client_sock)
     memcpy(temp.playerlist, Player, sizeof(PlayerInfo) * 3);
     memcpy(temp.feedlist, feed, sizeof(Feed) * MAXFEED);
 
+    retval = send(client_sock, (char*)&temp.type, sizeof(temp.type), 0);
     retval = send(client_sock, (char*)&temp, sizeof(temp), 0);
     if (retval == SOCKET_ERROR) err_display("Client Thread gobj send()");
 }
