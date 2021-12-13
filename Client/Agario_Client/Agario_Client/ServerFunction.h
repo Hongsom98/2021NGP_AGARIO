@@ -1,13 +1,58 @@
 #pragma once
-#include "PacketDefine.h"
+#include "..\..\..\Server\Server\PacketDefine.h"
+#include "Player.h"
+#include "GameObject.h"
+#include <mutex>
 #pragma warning(disable : 4996)
 
+Player player[3];
+GameObject feeds;
 WSADATA wsa;
 SOCKET sock;
 SOCKADDR_IN serveraddr;
+bool use_nickname{ FALSE };
 
-#define SERVERIP "112.152.55.39"
-//#define SERVERIP "127.0.0.1"
+//#define SERVERIP "112.152.55.39"
+#define SERVERIP "127.0.0.1"
+
+DWORD WINAPI RecvThread(LPVOID arg)
+{
+    int retval;
+    char type;
+    
+
+    while (true)
+    {
+        retval = recvn(sock, (char*)&type, sizeof(type), 0);
+        if (retval == SOCKET_ERROR) Sleep(3000);
+        
+        switch (type)
+        {
+        case NICKNAME_USE: {
+            ClientLoginOKPacket packet;
+            retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
+            use_nickname = true;
+            break;
+        }
+        case NICKNAME_UNUSE: {
+            ClientLoginOKPacket packet;
+            retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
+            use_nickname = false;
+            break;
+        }
+        case GAMEOBJECTLIST: {
+            GameObejctPacket packet;
+            recvn(sock, (char*)&packet, sizeof(packet), 0);
+            for (int i = 0; i < CLIENT; ++i) player[i].Update(packet.playerlist[i]);
+            feeds.Update(packet.feedlist);
+            break;
+        }
+
+        }
+        
+    }
+    closesocket(sock);
+}
 
 void SendInputData(POINT p, char Key = 'N')
 {
@@ -51,7 +96,9 @@ void SendID(char* ID)
 
 bool RecvIDCheck()
 {
+
     ClientLoginOKPacket temp;
+    recvn(sock, (char*)&temp.type, sizeof(temp.type), 0);
     int retval = recvn(sock, (char*)&temp, sizeof(ClientLoginOKPacket), 0);
     if (retval == SOCKET_ERROR) {
         err_display("recv()");
