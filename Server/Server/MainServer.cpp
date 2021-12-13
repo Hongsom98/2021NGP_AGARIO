@@ -78,17 +78,22 @@ void PlayerMove(const Input& input)
     float xVec = input.mousePos.x - Player[input.ClientNum].SellData[0].Center.x;
     float yVec = input.mousePos.y - Player[input.ClientNum].SellData[0].Center.y;
     float Distance = sqrtf(powf(xVec, 2) + powf(yVec, 2));
+    if (Distance == 0)
+    {
+        return;
+    }
     xVec /= Distance;
     yVec /= Distance;
+    if (input.ClientNum == 2) cout << xVec << ", " << yVec << endl;
     /*xVec = round(xVec);
     yVec = round(yVec);*/
 
     for (int i = 0; i < 4; ++i) {
         if (Player[input.ClientNum].SellData[i].Radius > 0) {
-            Player[input.ClientNum].SellData[i].Center.x += xVec * 2.0f;
+            Player[input.ClientNum].SellData[i].Center.x += xVec * 3.0f;
             if (Player[input.ClientNum].SellData[i].Center.x < 0)  Player[input.ClientNum].SellData[i].Center.x = 0;
             if (Player[input.ClientNum].SellData[i].Center.x > WINDOW_WIDTH - 5) Player[input.ClientNum].SellData[i].Center.x = WINDOW_WIDTH;
-            Player[input.ClientNum].SellData[i].Center.y += yVec * 2.0f;
+            Player[input.ClientNum].SellData[i].Center.y += yVec * 3.0f;
             if (Player[input.ClientNum].SellData[i].Center.y < 0) Player[input.ClientNum].SellData[i].Center.y = 0;
             if (Player[input.ClientNum].SellData[i].Center.y > WINDOW_HEIGHT - 5) Player[input.ClientNum].SellData[i].Center.y = WINDOW_HEIGHT;
         }
@@ -244,6 +249,19 @@ void isColidePlayerToFeed(PlayerInfo& Client)
     }
 }
 
+void PlayerDevide(const Input& input)
+{
+    if (Player[input.ClientNum].SellData[0].Radius >= 6.0f)
+    {
+        float Half_Radius = Player[input.ClientNum].SellData[0].Radius / 2;
+        Player[input.ClientNum].SellData[0].Radius = Half_Radius;
+        Player[input.ClientNum].SellData[1].Center.x = Player[input.ClientNum].SellData[0].Center.x + (2 * Half_Radius);
+        Player[input.ClientNum].SellData[1].Center.y = Player[input.ClientNum].SellData[0].Center.y;
+        Player[input.ClientNum].SellData[1].Radius = Half_Radius;
+    }
+}
+
+
 DWORD WINAPI ProcessClient(LPVOID arg)
 {
     SOCKET client_sock = (SOCKET)arg;
@@ -300,8 +318,19 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
         {
             Input temp = InputQueue.front();
             InputQueue.pop();
-
-            PlayerMove(temp);
+            switch (temp.InputKey)
+            {
+            case 'z':
+                PlayerDevide(temp);
+                break;
+            case 'x':
+                break;
+            case 'N':
+                PlayerMove(temp);
+                break;
+            default:
+                break;
+            }
             isColidePlayerToFeed(Player[temp.ClientNum]);
             isColidePlayerToPlayer(Player[temp.ClientNum], temp.ClientNum);
         }
