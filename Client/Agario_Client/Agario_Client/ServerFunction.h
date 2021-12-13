@@ -10,10 +10,11 @@ GameObject feeds;
 WSADATA wsa;
 SOCKET sock;
 SOCKADDR_IN serveraddr;
+bool isConnection{ false };
 enum USENICKNAME { NICK_YET, NICK_OK, NICK_NON };
 USENICKNAME nick = NICK_YET;
-//#define SERVERIP "112.152.55.39"
-#define SERVERIP "127.0.0.1"
+#define SERVERIP "112.152.55.39"
+//#define SERVERIP "127.0.0.1"
 
 DWORD WINAPI RecvThread(LPVOID arg)
 {
@@ -23,7 +24,6 @@ DWORD WINAPI RecvThread(LPVOID arg)
 
     while (true)
     {
-        if (!isConnection) continue;
         retval = recvn(sock, (char*)&type, sizeof(type), 0);
         if (retval == SOCKET_ERROR) {
             err_quit("RecvThread recv()");

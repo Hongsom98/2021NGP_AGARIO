@@ -84,8 +84,6 @@ void PlayerMove(const Input& input)
     }
     xVec /= Distance;
     yVec /= Distance;
-    /*xVec = round(xVec);
-    yVec = round(yVec);*/
 
     for (int i = 0; i < 4; ++i) {
         if (Player[input.ClientNum].SellData[i].Radius > 0) {
@@ -96,7 +94,7 @@ void PlayerMove(const Input& input)
             if (Player[input.ClientNum].SellData[i].Center.y < 0) Player[input.ClientNum].SellData[i].Center.y = 0;
             if (Player[input.ClientNum].SellData[i].Center.y > 761) Player[input.ClientNum].SellData[i].Center.y = 761;
         }
-        
+
     }
     for (int i = 1; i < 4; ++i)
     {
@@ -104,6 +102,7 @@ void PlayerMove(const Input& input)
             Player[input.ClientNum].SellData[i].Center.x = Player[input.ClientNum].SellData[i - 1].Center.x + Player[input.ClientNum].SellData[i - 1].Radius + Player[input.ClientNum].SellData[i].Radius;
         }
     }
+}
 
 void ProjectileMove()
 {
@@ -278,7 +277,6 @@ void PlayerDevide(const Input& input)
         Player[input.ClientNum].SellData[1].Radius = Half_Radius;
     }
 }
-
 
 void ColidePlayerToProjectile()
 {
