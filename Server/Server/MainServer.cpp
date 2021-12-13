@@ -19,6 +19,10 @@ std::uniform_real_distribution<> urdw(10, 784);
 std::uniform_real_distribution<> urdh(10, 761);
 std::uniform_int_distribution<> uidc(0, 255);
 
+BOOL devTimer = false;
+bool dev[3] = { false, false, false };
+int i = 0;
+
 void InitPlayers()
 {
     Player[0].SellData[0].Center.x = 300;
@@ -44,21 +48,21 @@ void SaveID(const char* NewID)
 }
 
 void SendID_OK(bool duplicated, SOCKET client_sock, const char* NewID) {
-    ClientLoginOKPacket packet;
-    packet.size = sizeof(packet);
-    int retval;
-    if (duplicated) {
-        SaveID(NewID);
-        packet.type = NICKNAME_USE;
-        retval = send(client_sock, (char*)&packet.type, sizeof(packet.type), 0);
-        retval = send(client_sock, (char*)&packet, sizeof(packet),0);
-    }
-    else {
-        packet.type = NICKNAME_UNUSE;
-        retval = send(client_sock, (char*)&packet.type, sizeof(packet.type), 0);
-        retval = send(client_sock, (char*)&packet, sizeof(packet), 0);
-    }
-    if (retval == SOCKET_ERROR) err_display("Client Thread ID send()");
+ClientLoginOKPacket packet;
+packet.size = sizeof(packet);
+int retval;
+if (duplicated) {
+    SaveID(NewID);
+    packet.type = NICKNAME_USE;
+    retval = send(client_sock, (char*)&packet.type, sizeof(packet.type), 0);
+    retval = send(client_sock, (char*)&packet, sizeof(packet), 0);
+}
+else {
+    packet.type = NICKNAME_UNUSE;
+    retval = send(client_sock, (char*)&packet.type, sizeof(packet.type), 0);
+    retval = send(client_sock, (char*)&packet, sizeof(packet), 0);
+}
+if (retval == SOCKET_ERROR) err_display("Client Thread ID send()");
 }
 
 bool CheckID(const char* ID)
@@ -74,9 +78,6 @@ bool CheckID(const char* ID)
     return true;
 }
 
-BOOL devTimer = false;
-bool dev[3] = { false, false, false };
-int i = 0;
 void PlayerMove(const Input& input)
 {
     float xVec = input.mousePos.x - Player[input.ClientNum].SellData[0].Center.x;
@@ -91,10 +92,10 @@ void PlayerMove(const Input& input)
 
     for (int i = 0; i < 4; ++i) {
         if (Player[input.ClientNum].SellData[i].Radius > 0) {
-            Player[input.ClientNum].SellData[i].Center.x += xVec * 3.0f;
+            Player[input.ClientNum].SellData[i].Center.x += xVec * 6.0f;
             if (Player[input.ClientNum].SellData[i].Center.x < 0)  Player[input.ClientNum].SellData[i].Center.x = 0;
             if (Player[input.ClientNum].SellData[i].Center.x > 784) Player[input.ClientNum].SellData[i].Center.x = 784;
-            Player[input.ClientNum].SellData[i].Center.y += yVec * 2.0f;
+            Player[input.ClientNum].SellData[i].Center.y += yVec * 4.0f;
             if (Player[input.ClientNum].SellData[i].Center.y < 0) Player[input.ClientNum].SellData[i].Center.y = 0;
             if (Player[input.ClientNum].SellData[i].Center.y > 761) Player[input.ClientNum].SellData[i].Center.y = 761;
         }
@@ -142,120 +143,46 @@ void SendObjectList(SOCKET client_sock)
     if (retval == SOCKET_ERROR) err_display("Client Thread gobj send()");
 }
 
-void isColidePlayerToPlayer(PlayerInfo& Client, int ClientNum)
-{
-    switch (ClientNum)
-    {
-    case 0:
-        if (sqrt(pow(Client.SellData[0].Center.x - Player[1].SellData[0].Center.x, 2) +
-            pow(Client.SellData[0].Center.y - Player[1].SellData[0].Center.y, 2))
-            < Client.SellData[0].Radius + Player[1].SellData[0].Radius)
-        {
-            if (Client.SellData[0].Radius < Player[1].SellData[0].Radius)
-            {
-                Player[1].SellData[0].Radius += Client.SellData[0].Radius;
-                Client.SellData[0].Radius = 0;
-                break;
+void isColidePlayerToPlayer()
+{    
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            if (sqrt(pow(Player[i].SellData[j].Center.x - Player[(i + 1) % 3].SellData[j].Center.x, 2) +
+                pow(Player[i].SellData[j].Center.y - Player[(i + 1) % 3].SellData[j].Center.y, 2))
+                < Player[i].SellData[j].Radius + Player[(i + 1) % 3].SellData[j].Radius) {
+
+                if (Player[i].SellData[j].Radius < Player[(i + 1) % 3].SellData[j].Radius)
+                {
+                    Player[(i + 1) % 3].SellData[j].Radius += Player[i].SellData[j].Radius;
+                    Player[i].SellData[j].Radius = 0;
+                    break;
+                }
+                else
+                {
+                    Player[i].SellData[j].Radius += Player[(i + 1) % 3].SellData[j].Radius;
+                    Player[(i + 1) % 3].SellData[j].Radius = 0;
+                    break;
+                }
             }
-            else
-            {
-                Client.SellData[0].Radius += Player[1].SellData[0].Radius;
-                Player[1].SellData[0].Radius = 0;
-                break;
-            }
-        }
-        if (sqrt(pow(Client.SellData[0].Center.x - Player[2].SellData[0].Center.x, 2) +
-            pow(Client.SellData[0].Center.y - Player[2].SellData[0].Center.y, 2))
-            < Client.SellData[0].Radius + Player[2].SellData[0].Radius)
-        {
-            if (Client.SellData[0].Radius < Player[2].SellData[0].Radius)
-            {
-                Player[2].SellData[0].Radius += Client.SellData[0].Radius;
-                Client.SellData[0].Radius = 0;
-                break;
-            }
-            else
-            {
-                Client.SellData[0].Radius += Player[2].SellData[0].Radius;
-                Player[2].SellData[0].Radius = 0;
-                break;
-            }
-        }
-        break;
-    case 1:
-        if (sqrt(pow(Client.SellData[0].Center.x - Player[0].SellData[0].Center.x, 2) +
-            pow(Client.SellData[0].Center.y - Player[0].SellData[0].Center.y, 2))
-            < Client.SellData[0].Radius + Player[0].SellData[0].Radius)
-        {
-            if (Client.SellData[0].Radius < Player[0].SellData[0].Radius)
-            {
-                Player[0].SellData[0].Radius += Client.SellData[0].Radius;
-                Client.SellData[0].Radius = 0;
-                break;
-            }
-            else
-            {
-                Client.SellData[0].Radius += Player[0].SellData[0].Radius;
-                Player[0].SellData[0].Radius = 0;
-                break;
+
+            if (sqrt(pow(Player[i].SellData[j].Center.x - Player[(i + 1) % 3].SellData[(j + 1) % 2].Center.x, 2) +
+                pow(Player[i].SellData[j].Center.y - Player[(i + 1) % 3].SellData[(j + 1) % 2].Center.y, 2))
+                < Player[i].SellData[j].Radius + Player[(i + 1) % 3].SellData[(j + 1) % 2].Radius) {
+
+                if (Player[i].SellData[j].Radius < Player[(i + 1) % 3].SellData[(j + 1) % 2].Radius)
+                {
+                    Player[(i + 1) % 3].SellData[(j + 1) % 2].Radius += Player[i].SellData[j].Radius;
+                    Player[i].SellData[j].Radius = 0;
+                    break;
+                }
+                else
+                {
+                    Player[i].SellData[j].Radius += Player[(i + 1) % 3].SellData[(j + 1) % 2].Radius;
+                    Player[(i + 1) % 3].SellData[(j + 1) % 2].Radius = 0;
+                    break;
+                }
             }
         }
-        if (sqrt(pow(Client.SellData[0].Center.x - Player[2].SellData[0].Center.x, 2) +
-            pow(Client.SellData[0].Center.y - Player[2].SellData[0].Center.y, 2))
-            < Client.SellData[0].Radius + Player[2].SellData[0].Radius)
-        {
-            if (Client.SellData[0].Radius < Player[2].SellData[0].Radius)
-            {
-                Player[2].SellData[0].Radius += Client.SellData[0].Radius;
-                Client.SellData[0].Radius = 0;
-                break;
-            }
-            else
-            {
-                Client.SellData[0].Radius += Player[2].SellData[0].Radius;
-                Player[2].SellData[0].Radius = 0;
-                break;
-            }
-        }
-        break;
-    case 2:
-        if (sqrt(pow(Client.SellData[0].Center.x - Player[0].SellData[0].Center.x, 2) +
-            pow(Client.SellData[0].Center.y - Player[0].SellData[0].Center.y, 2))
-            < Client.SellData[0].Radius + Player[0].SellData[0].Radius)
-        {
-            if (Client.SellData[0].Radius < Player[0].SellData[0].Radius)
-            {
-                Player[0].SellData[0].Radius += Client.SellData[0].Radius;
-                Client.SellData[0].Radius = 0;
-                break;
-            }
-            else
-            {
-                Client.SellData[0].Radius += Player[0].SellData[0].Radius;
-                Player[0].SellData[0].Radius = 0;
-                break;
-            }
-        }
-        if (sqrt(pow(Client.SellData[0].Center.x - Player[1].SellData[0].Center.x, 2) +
-            pow(Client.SellData[0].Center.y - Player[1].SellData[0].Center.y, 2))
-            < Client.SellData[0].Radius + Player[1].SellData[0].Radius)
-        {
-            if (Client.SellData[0].Radius < Player[1].SellData[0].Radius)
-            {
-                Player[1].SellData[0].Radius += Client.SellData[0].Radius;
-                Client.SellData[0].Radius = 0;
-                break;
-            }
-            else
-            {
-                Client.SellData[0].Radius += Player[1].SellData[0].Radius;
-                Player[1].SellData[0].Radius = 0;
-                break;
-            }
-        }
-        break;
-    default:
-        break;
     }
 }
 
@@ -304,7 +231,7 @@ void CreateNewFeed()
 
 void PlayerDevide(const Input& input)
 {
-    if (Player[input.ClientNum].SellData[0].Radius >= 10.0f && Player[input.ClientNum].SellData[1].Radius == 0)
+    if (Player[input.ClientNum].SellData[0].Radius >= 10.0f|| Player[input.ClientNum].SellData[1].Radius >= 10.0f)
     {
         float Half_Radius = Player[input.ClientNum].SellData[0].Radius / 2;
         Player[input.ClientNum].SellData[0].Radius = Half_Radius;
@@ -363,53 +290,6 @@ void SpitFeed(const Input& input)
             }
         }
     }
-}
-
-DWORD WINAPI ProcessClient(LPVOID arg)
-{
-    SOCKET client_sock = (SOCKET)arg;
-    int retval;
-    int ClientNum = nowID;
-    char type;
-
-    while (true) {
-        WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
-
-        retval = recvn(client_sock, (char*)&type, sizeof(type), 0);
-        if (retval == SOCKET_ERROR) err_display("Client Thread Type recv()");
-
-        switch (type) {
-            case NICKNAME_ADD:
-            {
-                ClientLoginPacket packet;
-                retval = recvn(client_sock, (char*)&packet, sizeof(packet), 0);
-                if (retval == SOCKET_ERROR) err_display("Client Thread ID recv()");
-
-                if (CheckID(packet.ID) && nowID < 3) SendID_OK(true, client_sock, packet.ID);
-                else SendID_OK(false, client_sock, NULL);
-            }
-                break;
-            case INPUTDATA:
-            {
-                PlayerInputPacket packet;
-                retval = recvn(client_sock, (char*)&packet, sizeof(packet), 0);
-                if (retval == SOCKET_ERROR) err_display("Client Thread Input recv()");
-                InputQueue.push({ ClientNum, packet.keyState, packet.mousePos });
-            }
-                break;
-        }
-
-        if (ClientNum < 2) SetEvent(ClientEvent[ClientNum + 1]);
-        if (ClientNum == 2) SetEvent(UpdateEvent);
-
-        WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
-        SendObjectList(client_sock);
-
-        SetEvent(ClientEvent[(ClientNum + 1) % 3]);
-    }
-
-    closesocket(client_sock);
-    return 0;
 }
 
 void devani(const Input& input)
@@ -492,6 +372,53 @@ void devani(const Input& input)
     }
 }
 
+DWORD WINAPI ProcessClient(LPVOID arg)
+{
+    SOCKET client_sock = (SOCKET)arg;
+    int retval;
+    int ClientNum = nowID;
+    char type;
+
+    while (true) {
+        WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
+
+        retval = recvn(client_sock, (char*)&type, sizeof(type), 0);
+        if (retval == SOCKET_ERROR) err_display("Client Thread Type recv()");
+
+        switch (type) {
+            case NICKNAME_ADD:
+            {
+                ClientLoginPacket packet;
+                retval = recvn(client_sock, (char*)&packet, sizeof(packet), 0);
+                if (retval == SOCKET_ERROR) err_display("Client Thread ID recv()");
+
+                if (CheckID(packet.ID) && nowID < 3) SendID_OK(true, client_sock, packet.ID);
+                else SendID_OK(false, client_sock, NULL);
+            }
+                break;
+            case INPUTDATA:
+            {
+                PlayerInputPacket packet;
+                retval = recvn(client_sock, (char*)&packet, sizeof(packet), 0);
+                if (retval == SOCKET_ERROR) err_display("Client Thread Input recv()");
+                InputQueue.push({ ClientNum, packet.keyState, packet.mousePos });
+            }
+                break;
+        }
+
+        if (ClientNum < 2) SetEvent(ClientEvent[ClientNum + 1]);
+        if (ClientNum == 2) SetEvent(UpdateEvent);
+
+        WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
+        SendObjectList(client_sock);
+
+        SetEvent(ClientEvent[(ClientNum + 1) % 3]);
+    }
+
+    closesocket(client_sock);
+    return 0;
+}
+
 DWORD WINAPI ProcessUpdate(LPVOID arg)
 {
     tm.SetPreTime();
@@ -502,6 +429,7 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
         {
             Input temp = InputQueue.front();
             InputQueue.pop();
+
             switch (temp.InputKey)
             {
             case 'z':
@@ -521,7 +449,7 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
             }
             ProjectileMove();
             isColidePlayerToFeed(Player[temp.ClientNum]);
-            isColidePlayerToPlayer(Player[temp.ClientNum], temp.ClientNum);
+            isColidePlayerToPlayer();
             ColidePlayerToProjectile(temp.ClientNum);
             CheckPlayerDevide();
         }
