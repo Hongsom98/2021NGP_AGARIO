@@ -10,13 +10,12 @@
 
 
 Map map;
-POINT camera{ 50, 50 };
 POINT Mouse{ 0,0 };
 TCHAR InputID[12] = { 0 };
-bool isConnection{ false };
 HDC memDC;
 RECT ClientRect;
 HBITMAP hBitmap;
+char test[50];
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow)
 {
@@ -33,14 +32,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
     MSG msg;
     memset(&msg, 0, sizeof(msg));
+    HANDLE hThread;
+    hThread = CreateThread(NULL, 0, RecvThread, NULL, 0, NULL);
+
+    /*
     BOOL PerformFlg = FALSE;
     LONGLONG NowTime = 0;
     LONGLONG LastTime = 0;
     LONGLONG Frequency = 0;
     LONGLONG OneFrameCnt = 0;
 
-    HANDLE hThread;
-    hThread = CreateThread(NULL, 0, RecvThread, NULL, 0, NULL);
 
     if (::QueryPerformanceFrequency((LARGE_INTEGER*)&Frequency)) {
         PerformFlg = TRUE;
@@ -53,8 +54,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         OneFrameCnt = 1000 / FPS;
         LastTime = (LONGLONG)::timeGetTime();
     }
-
-    
     while (msg.message != WM_QUIT)
     {
         if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -74,8 +73,30 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
             }
         }
     }
-   
     if (PerformFlg == FALSE) timeEndPeriod(1);
+    */
+
+    system_clock::time_point LastTime = system_clock::now();
+    system_clock::time_point NowTime = LastTime;
+    float FrameCnt = 1.f / FPS;
+
+    while (msg.message != WM_QUIT)
+    {
+        if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        else {
+            NowTime = system_clock::now();
+            if (LastTime > NowTime) LastTime = NowTime;
+            float dt = duration<double>(NowTime - LastTime).count();
+            if (dt > FrameCnt) {
+                Update();
+                Render();
+                LastTime = system_clock::now();
+            }
+        }
+    }
 
     closesocket(sock);
     WSACleanup();
@@ -139,10 +160,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (wParam == VK_RETURN) {
                 if (!isConnection) {
                     SendID(InputID);
-                    
-                    if (RecvIDCheck()) { 
+                    while (nick == NICK_YET);
+
+                    if (nick == NICK_OK) {
                         isConnection = true; }
-                    else {
+                    else if(nick == NICK_NON) {
+                        nick = NICK_YET;
                         memset(InputID, 0, 12);
                         len = 0;
                     }
@@ -192,12 +215,11 @@ void Update()
     GetCursorPos(&Mouse);
     ScreenToClient(hWnd, &Mouse);
 
-    if (GetKeyState(0x5A) & 0x8000)
+    if (GetAsyncKeyState(0x5A) & 0x0001)
     {
         SendInputData(Mouse, 'z');
-        
     }
-    else if (GetKeyState(0x58) & 0x8000)
+    else if (GetAsyncKeyState(0x58) & 0x0001)
     {
         SendInputData(Mouse, 'x');
     }
