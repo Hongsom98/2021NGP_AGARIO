@@ -8,8 +8,7 @@
 #include "Map.h"
 #define FPS 30
 
-Player player[3];
-GameObject feeds;
+
 Map map;
 POINT Mouse{ 0,0 };
 TCHAR InputID[12] = { 0 };
@@ -34,6 +33,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
     MSG msg;
     memset(&msg, 0, sizeof(msg));
+    HANDLE hThread;
+    hThread = CreateThread(NULL, 0, RecvThread, NULL, 0, NULL);
 
     /*
     BOOL PerformFlg = FALSE;
@@ -41,6 +42,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     LONGLONG LastTime = 0;
     LONGLONG Frequency = 0;
     LONGLONG OneFrameCnt = 0;
+
+
     if (::QueryPerformanceFrequency((LARGE_INTEGER*)&Frequency)) {
         PerformFlg = TRUE;
         OneFrameCnt = Frequency / FPS;
@@ -156,7 +159,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (wParam == VK_RETURN) {
                 if (!isConnection) {
                     SendID(InputID);
-                    if (RecvIDCheck()) isConnection = true;
+                    
+                    if (RecvIDCheck()) { 
+                        isConnection = true; }
                     else {
                         memset(InputID, 0, 12);
                         len = 0;
@@ -221,9 +226,7 @@ void Update()
         SendInputData(Mouse);
     }
 
-    GameObejctPacket packet = RecvObjects();
-    for (int i = 0; i < CLIENT; ++i) player[i].Update(packet.playerlist[i]);
-    feeds.Update(packet.feedlist);
+   
 }
 
 void Render()
