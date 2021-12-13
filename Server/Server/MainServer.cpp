@@ -73,6 +73,8 @@ bool CheckID(const char* ID)
     return true;
 }
 
+BOOL devTimer = false;
+int i = 0;
 void PlayerMove(const Input& input)
 {
     float xVec = input.mousePos.x - Player[input.ClientNum].SellData[0].Center.x;
@@ -96,12 +98,12 @@ void PlayerMove(const Input& input)
         }
 
     }
-    for (int i = 1; i < 4; ++i)
-    {
-        if (Player[input.ClientNum].SellData[i].Radius > 0) {
-            Player[input.ClientNum].SellData[i].Center.x = Player[input.ClientNum].SellData[i - 1].Center.x + Player[input.ClientNum].SellData[i - 1].Radius + Player[input.ClientNum].SellData[i].Radius;
-        }
-    }
+    //for (int i = 1; i < 2; ++i)
+    //{
+    //    if (Player[input.ClientNum].SellData[i].Radius > 0) {
+    //        Player[input.ClientNum].SellData[i].Center.x = Player[input.ClientNum].SellData[i - 1].Center.x + Player[input.ClientNum].SellData[i - 1].Radius + Player[input.ClientNum].SellData[i].Radius;
+    //    }
+    //}
 }
 
 void ProjectileMove()
@@ -272,7 +274,7 @@ void PlayerDevide(const Input& input)
     {
         float Half_Radius = Player[input.ClientNum].SellData[0].Radius / 2;
         Player[input.ClientNum].SellData[0].Radius = Half_Radius;
-        Player[input.ClientNum].SellData[1].Center.x = Player[input.ClientNum].SellData[0].Center.x + (2 * Half_Radius);
+        Player[input.ClientNum].SellData[1].Center.x = Player[input.ClientNum].SellData[0].Center.x;// +(2 * Half_Radius);
         Player[input.ClientNum].SellData[1].Center.y = Player[input.ClientNum].SellData[0].Center.y;
         Player[input.ClientNum].SellData[1].Radius = Half_Radius;
     }
@@ -369,6 +371,37 @@ DWORD WINAPI ProcessClient(LPVOID arg)
     return 0;
 }
 
+void devani(const Input& input)
+{
+    if (devTimer) {
+        if (i < 50) {
+            Player[input.ClientNum].SellData[0].Center.x -= 5.0f;
+            Player[input.ClientNum].SellData[0].Center.y -= 5.0f;
+            Player[input.ClientNum].SellData[1].Center.x += 5.0f;
+            Player[input.ClientNum].SellData[1].Center.y += 5.0f;
+        }
+        if (i > 50) {
+            Player[input.ClientNum].SellData[0].Center.x += 5.0f;
+            Player[input.ClientNum].SellData[0].Center.y += 5.0f;
+            Player[input.ClientNum].SellData[1].Center.x -= 5.0f;
+            Player[input.ClientNum].SellData[1].Center.y -= 5.0f;
+        }
+        if (i == 100)
+        {
+            devTimer = false;
+            i = 0;
+        }
+        i++;
+    }
+    else if (!devTimer && Player[input.ClientNum].SellData[1].Radius > 0)
+    {
+        if (Player[input.ClientNum].SellData[1].Radius > 0) {
+            Player[input.ClientNum].SellData[1].Center.x = Player[input.ClientNum].SellData[0].Center.x + Player[input.ClientNum].SellData[0].Radius + Player[input.ClientNum].SellData[1].Radius;
+            Player[input.ClientNum].SellData[1].Center.y = Player[input.ClientNum].SellData[0].Center.y + Player[input.ClientNum].SellData[0].Radius + Player[input.ClientNum].SellData[1].Radius;
+        }
+    }
+}
+
 DWORD WINAPI ProcessUpdate(LPVOID arg)
 {
     while (true)
@@ -382,6 +415,7 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
             {
             case 'z':
                 PlayerDevide(temp);
+                devTimer = true;
                 break;
             case 'x':
                 SpitFeed(temp);
@@ -389,10 +423,12 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
             case 'N':
                 ProjectileMove();
                 PlayerMove(temp);
+                if(devTimer) devani(temp);
                 break;
             default:
                 break;
             }
+
             isColidePlayerToFeed(Player[temp.ClientNum]);
             isColidePlayerToPlayer(Player[temp.ClientNum], temp.ClientNum);
             ColidePlayerToProjectile();

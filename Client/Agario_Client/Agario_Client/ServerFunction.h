@@ -14,6 +14,7 @@ bool isConnection{ false };
 
 //#define SERVERIP "112.152.55.39"
 #define SERVERIP "127.0.0.1"
+//#define SERVERIP "210.99.123.204"
 
 //DWORD WINAPI RecvThread(LPVOID arg)
 //{
