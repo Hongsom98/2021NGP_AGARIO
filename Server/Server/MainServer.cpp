@@ -97,6 +97,13 @@ void PlayerMove(const Input& input)
             if (Player[input.ClientNum].SellData[i].Center.y < 0) Player[input.ClientNum].SellData[i].Center.y = 0;
             if (Player[input.ClientNum].SellData[i].Center.y > WINDOW_HEIGHT - 5) Player[input.ClientNum].SellData[i].Center.y = WINDOW_HEIGHT;
         }
+        
+    }
+    for (int i = 1; i < 4; ++i)
+    {
+        if (Player[input.ClientNum].SellData[i].Radius > 0) {
+            Player[input.ClientNum].SellData[i].Center.x = Player[input.ClientNum].SellData[i - 1].Center.x + Player[input.ClientNum].SellData[i - 1].Radius + Player[input.ClientNum].SellData[i].Radius;
+        }
     }
 
 }

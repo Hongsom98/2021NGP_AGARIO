@@ -139,10 +139,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (wParam == VK_RETURN) {
                 if (!isConnection) {
                     SendID(InputID);
-                    
-                    if (RecvIDCheck()) { 
+                    while (nick == NICK_YET);
+
+                    if (nick == NICK_OK) {
                         isConnection = true; }
-                    else {
+                    else if(nick == NICK_NON) {
+                        nick = NICK_YET;
                         memset(InputID, 0, 12);
                         len = 0;
                     }

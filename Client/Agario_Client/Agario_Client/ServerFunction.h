@@ -10,8 +10,8 @@ GameObject feeds;
 WSADATA wsa;
 SOCKET sock;
 SOCKADDR_IN serveraddr;
-bool use_nickname{ FALSE };
-
+enum USENICKNAME { NICK_YET, NICK_OK, NICK_NON };
+USENICKNAME nick = NICK_YET;
 //#define SERVERIP "112.152.55.39"
 #define SERVERIP "127.0.0.1"
 
@@ -24,11 +24,19 @@ DWORD WINAPI RecvThread(LPVOID arg)
     while (true)
     {
         retval = recvn(sock, (char*)&type, sizeof(type), 0);
-        if (retval == SOCKET_ERROR) Sleep(3000);
+        //if (retval == SOCKET_ERROR) Sleep(3000);
         
         switch (type)
         {
-      
+
+        case NICKNAME_USE: {
+            nick = NICK_OK;
+            break;
+        }
+        case NICKNAME_UNUSE: {
+            nick = NICK_NON;
+            break;
+        }
         case GAMEOBJECTLIST: {
             GameObejctPacket packet;
             recvn(sock, (char*)&packet, sizeof(packet), 0);
