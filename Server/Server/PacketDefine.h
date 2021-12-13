@@ -30,6 +30,7 @@ struct GameObejctPacket
 	char size;
 	PlayerInfo playerlist[3];
 	Feed feedlist[MAXFEED];
+    Projectile projectile[MAXPROJ];
 };
 
 struct PlayerInputPacket

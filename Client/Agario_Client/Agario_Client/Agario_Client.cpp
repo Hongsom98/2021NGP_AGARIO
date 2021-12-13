@@ -12,7 +12,6 @@
 Map map;
 POINT Mouse{ 0,0 };
 TCHAR InputID[12] = { 0 };
-bool isConnection{ false };
 HDC memDC;
 RECT ClientRect;
 HBITMAP hBitmap;
@@ -77,9 +76,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     if (PerformFlg == FALSE) timeEndPeriod(1);
     */
 
-    int NowTime = 0;
-    int LastTime = GetTickCount64();
-    int FrameCnt = 1000 / FPS;
+    system_clock::time_point LastTime = system_clock::now();
+    system_clock::time_point NowTime = LastTime;
+    float FrameCnt = 1.f / FPS;
 
     while (msg.message != WM_QUIT)
     {
@@ -88,11 +87,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
             DispatchMessage(&msg);
         }
         else {
-            NowTime = GetTickCount64();
-            if (NowTime >= LastTime + FrameCnt) {
+            NowTime = system_clock::now();
+            if (LastTime > NowTime) LastTime = NowTime;
+            float dt = duration<double>(NowTime - LastTime).count();
+            if (dt > FrameCnt) {
                 Update();
                 Render();
-                LastTime = NowTime;
+                LastTime = system_clock::now();
             }
         }
     }
@@ -212,12 +213,11 @@ void Update()
     GetCursorPos(&Mouse);
     ScreenToClient(hWnd, &Mouse);
 
-    if (GetKeyState(0x5A) & 0x8000)
+    if (GetAsyncKeyState(0x5A) & 0x0001)
     {
         SendInputData(Mouse, 'z');
-        
     }
-    else if (GetKeyState(0x58) & 0x8000)
+    else if (GetAsyncKeyState(0x58) & 0x0001)
     {
         SendInputData(Mouse, 'x');
     }

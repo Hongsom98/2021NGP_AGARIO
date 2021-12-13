@@ -8,3 +8,5 @@
 
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "winmm.lib")
+
+using namespace std::chrono;

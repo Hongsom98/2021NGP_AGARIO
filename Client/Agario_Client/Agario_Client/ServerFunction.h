@@ -10,6 +10,7 @@ GameObject feeds;
 WSADATA wsa;
 SOCKET sock;
 SOCKADDR_IN serveraddr;
+bool isConnection{ false };
 bool use_nickname{ FALSE };
 
 //#define SERVERIP "112.152.55.39"
@@ -23,24 +24,29 @@ DWORD WINAPI RecvThread(LPVOID arg)
 
     while (true)
     {
+        if (!isConnection) continue;
         retval = recvn(sock, (char*)&type, sizeof(type), 0);
-        if (retval == SOCKET_ERROR) Sleep(3000);
+        if (retval == SOCKET_ERROR) {
+            err_quit("RecvThread recv()");
+            break;
+        }
         
         switch (type)
         {
       
-        case GAMEOBJECTLIST: {
-            GameObejctPacket packet;
-            recvn(sock, (char*)&packet, sizeof(packet), 0);
-            for (int i = 0; i < CLIENT; ++i) player[i].Update(packet.playerlist[i]);
-            feeds.Update(packet.feedlist);
-            break;
-        }
+            case GAMEOBJECTLIST: {
+                GameObejctPacket packet;
+                recvn(sock, (char*)&packet, sizeof(packet), 0);
+                for (int i = 0; i < CLIENT; ++i) player[i].Update(packet.playerlist[i]);
+                feeds.Update(packet.feedlist, packet.projectile);
+                break;
+            }
 
         }
         
     }
     closesocket(sock);
+    return 0;
 }
 
 void SendInputData(POINT p, char Key = 'N')

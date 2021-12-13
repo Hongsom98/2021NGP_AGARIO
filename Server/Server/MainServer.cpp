@@ -6,6 +6,7 @@
 using namespace std;
 PlayerInfo Player[3];
 Feed feed[MAXFEED];
+Projectile projectiles[20];
 USHORT ClientPorts[3];
 int nowID = 0;
 HANDLE ClientEvent[3];
@@ -13,10 +14,9 @@ HANDLE UpdateEvent;
 queue<Input> InputQueue;
 std::random_device rd;
 std::mt19937 gen(rd());
-std::uniform_real_distribution<> urdw(10, WINDOW_WIDTH - 10);
-std::uniform_real_distribution<> urdh(10, WINDOW_HEIGHT - 10);
+std::uniform_real_distribution<> urdw(10, 784);
+std::uniform_real_distribution<> urdh(10, 761);
 std::uniform_int_distribution<> uidc(0, 255);
-void isColidePlayerToFeed(PlayerInfo& Client);
 
 void InitPlayers()
 {
@@ -80,20 +80,32 @@ void PlayerMove(const Input& input)
     float Distance = sqrtf(powf(xVec, 2) + powf(yVec, 2));
     xVec /= Distance;
     yVec /= Distance;
-    /*xVec = round(xVec);
-    yVec = round(yVec);*/
 
     for (int i = 0; i < 4; ++i) {
         if (Player[input.ClientNum].SellData[i].Radius > 0) {
             Player[input.ClientNum].SellData[i].Center.x += xVec * 2.0f;
             if (Player[input.ClientNum].SellData[i].Center.x < 0)  Player[input.ClientNum].SellData[i].Center.x = 0;
-            if (Player[input.ClientNum].SellData[i].Center.x > WINDOW_WIDTH - 5) Player[input.ClientNum].SellData[i].Center.x = WINDOW_WIDTH;
+            if (Player[input.ClientNum].SellData[i].Center.x > 784) Player[input.ClientNum].SellData[i].Center.x = 784;
             Player[input.ClientNum].SellData[i].Center.y += yVec * 2.0f;
             if (Player[input.ClientNum].SellData[i].Center.y < 0) Player[input.ClientNum].SellData[i].Center.y = 0;
-            if (Player[input.ClientNum].SellData[i].Center.y > WINDOW_HEIGHT - 5) Player[input.ClientNum].SellData[i].Center.y = WINDOW_HEIGHT;
+            if (Player[input.ClientNum].SellData[i].Center.y > 761) Player[input.ClientNum].SellData[i].Center.y = 761;
         }
     }
 
+}
+
+void ProjectileMove()
+{
+    for (int i = 0; i < MAXPROJ; ++i) {
+        if (projectiles[i].Color) {
+            projectiles[i].Center.x += projectiles[i].xSpeed * 10.0f;
+            projectiles[i].Center.y += projectiles[i].ySpeed * 10.0f;
+            if (projectiles[i].xSpeed > 0.01) projectiles[i].xSpeed /= 4.f;
+            else projectiles[i].xSpeed = 0;
+            if (projectiles[i].ySpeed > 0.01) projectiles[i].ySpeed /= 4.f;
+            else projectiles[i].ySpeed = 0;
+        }
+    }
 }
 
 void SendObjectList(SOCKET client_sock)
@@ -104,6 +116,7 @@ void SendObjectList(SOCKET client_sock)
     temp.size = sizeof(temp);
     memcpy(temp.playerlist, Player, sizeof(PlayerInfo) * 3);
     memcpy(temp.feedlist, feed, sizeof(Feed) * MAXFEED);
+    memcpy(temp.projectile, projectiles, sizeof(Projectile) * MAXPROJ);
 
     retval = send(client_sock, (char*)&temp.type, sizeof(temp.type), 0);
     retval = send(client_sock, (char*)&temp, sizeof(temp), 0);
@@ -227,7 +240,6 @@ void isColidePlayerToPlayer(PlayerInfo& Client, int ClientNum)
     }
 }
 
-
 void isColidePlayerToFeed(PlayerInfo& Client)
 {
     for (int i = 0; i < MAXFEED; ++i)
@@ -239,6 +251,50 @@ void isColidePlayerToFeed(PlayerInfo& Client)
                 Client.Score += 1;
                 feed[i].Center.x = urdw(gen);
                 feed[i].Center.y = urdh(gen);
+            }
+        }
+    }
+}
+
+void ColidePlayerToProjectile()
+{
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < MAXPROJ; ++j) {
+            if (projectiles[j].Color) {
+                for (int k = 0; k < 4; ++i) {
+                    if (Player[i].SellData[k].Radius) {
+                        if (sqrt(pow(Player[i].SellData[k].Center.x - projectiles[j].Center.x, 2) + pow(Player[i].SellData[k].Center.y - projectiles[j].Center.y, 2)) < Player[i].SellData[k].Radius + 6) {
+                            if (Player[i].Color != projectiles[j].Color) Player[i].Score++;
+                            Player[i].SellData[k].Radius += 0.6;
+                            projectiles[j].Color = 0;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void SpitFeed(const Input& input)
+{
+    for (int i = 0; i < 4; ++i) {
+        if (Player[input.ClientNum].SellData[i].Radius > 0) {
+            for (int j = 0; j < MAXPROJ; ++j) {
+                if (!projectiles[j].Color) {
+                    float xVec = input.mousePos.x - Player[input.ClientNum].SellData[i].Center.x;
+                    float yVec = input.mousePos.y - Player[input.ClientNum].SellData[i].Center.y;
+                    float Distance = sqrtf(powf(xVec, 2) + powf(yVec, 2));
+                    xVec /= Distance;
+                    yVec /= Distance;
+                    projectiles[j].Center.x = Player[input.ClientNum].SellData[i].Center.x + Player[input.ClientNum].SellData[i].Radius + xVec * 8.f;
+                    projectiles[j].Center.y = Player[input.ClientNum].SellData[i].Center.y + Player[input.ClientNum].SellData[i].Radius + yVec * 8.f;
+                    projectiles[j].Color = Player[input.ClientNum].Color;
+                    projectiles[j].xSpeed = xVec;
+                    projectiles[j].ySpeed = yVec;
+                    Player[input.ClientNum].SellData[i].Radius -= 6;
+                    return;
+                }
             }
         }
     }
@@ -302,8 +358,11 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
             InputQueue.pop();
 
             PlayerMove(temp);
+            ProjectileMove();
+            if (temp.InputKey == 'x') SpitFeed(temp);
             isColidePlayerToFeed(Player[temp.ClientNum]);
             isColidePlayerToPlayer(Player[temp.ClientNum], temp.ClientNum);
+            ColidePlayerToProjectile();
         }
         SetEvent(ClientEvent[0]);
     }
