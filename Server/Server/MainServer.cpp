@@ -110,6 +110,7 @@ void ProjectileMove()
         if (projectiles[i].Color) {
             projectiles[i].Center.x += projectiles[i].xSpeed * 10.0f;
             projectiles[i].Center.y += projectiles[i].ySpeed * 10.0f;
+            cout << projectiles[i].xSpeed << ", " << projectiles[i].ySpeed << endl;
             if (projectiles[i].xSpeed > 0.01) projectiles[i].xSpeed /= 4.f;
             else projectiles[i].xSpeed = 0;
             if (projectiles[i].ySpeed > 0.01) projectiles[i].ySpeed /= 4.f;
@@ -380,19 +381,19 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
             InputQueue.pop();
             switch (temp.InputKey)
             {
-            case 'z':
-                PlayerDevide(temp);
-                break;
-            case 'x':
-                SpitFeed(temp);
-                break;
-            case 'N':
-                ProjectileMove();
-                PlayerMove(temp);
-                break;
-            default:
-                break;
+                case 'z':
+                    PlayerDevide(temp);
+                    break;
+                case 'x':
+                    SpitFeed(temp);
+                    break;
+                case 'N':
+                    PlayerMove(temp);
+                    break;
+                default:
+                    break;
             }
+            ProjectileMove();
             isColidePlayerToFeed(Player[temp.ClientNum]);
             isColidePlayerToPlayer(Player[temp.ClientNum], temp.ClientNum);
             ColidePlayerToProjectile();
