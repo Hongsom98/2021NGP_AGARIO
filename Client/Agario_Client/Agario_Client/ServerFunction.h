@@ -28,18 +28,7 @@ DWORD WINAPI RecvThread(LPVOID arg)
         
         switch (type)
         {
-        case NICKNAME_USE: {
-            ClientLoginOKPacket packet;
-            retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
-            use_nickname = true;
-            break;
-        }
-        case NICKNAME_UNUSE: {
-            ClientLoginOKPacket packet;
-            retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
-            use_nickname = false;
-            break;
-        }
+      
         case GAMEOBJECTLIST: {
             GameObejctPacket packet;
             recvn(sock, (char*)&packet, sizeof(packet), 0);
