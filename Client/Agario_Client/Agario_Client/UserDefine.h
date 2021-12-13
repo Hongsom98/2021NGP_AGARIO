@@ -4,7 +4,7 @@
 #define WINDOW_HEIGHT	800
 
 #define MAXFEED			300
-#define MAXPROJ			20
+#define MAXPROJ			50
 #define CLIENT			3
 struct Feed
 {
@@ -19,6 +19,7 @@ struct Projectile
 	float xSpeed;
 	float ySpeed;
 	COLORREF Color = 0;
+	float MoveDist = 0;
 };
 
 struct CObject

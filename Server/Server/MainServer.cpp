@@ -6,7 +6,7 @@
 using namespace std;
 PlayerInfo Player[3];
 Feed feed[MAXFEED];
-Projectile projectiles[20];
+Projectile projectiles[MAXPROJ];
 USHORT ClientPorts[3];
 int nowID = 0;
 HANDLE ClientEvent[3];
@@ -109,13 +109,13 @@ void ProjectileMove()
 {
     for (int i = 0; i < MAXPROJ; ++i) {
         if (projectiles[i].Color) {
-            projectiles[i].Center.x += projectiles[i].xSpeed * 10.0f;
-            projectiles[i].Center.y += projectiles[i].ySpeed * 10.0f;
-            cout << projectiles[i].xSpeed << ", " << projectiles[i].ySpeed << endl;
-            if (projectiles[i].xSpeed > 0.01) projectiles[i].xSpeed /= 4.f;
-            else projectiles[i].xSpeed = 0;
-            if (projectiles[i].ySpeed > 0.01) projectiles[i].ySpeed /= 4.f;
-            else projectiles[i].ySpeed = 0;
+            projectiles[i].Center.x += projectiles[i].xSpeed * 3.0f;
+            projectiles[i].Center.y += projectiles[i].ySpeed * 3.0f;
+            projectiles[i].MoveDist += projectiles[i].xSpeed * 3.0f + projectiles[i].ySpeed * 3.0f;
+            if (projectiles[i].MoveDist >= 70.f) {
+                projectiles[i].xSpeed = 0;
+                projectiles[i].ySpeed = 0;
+            }
         }
     }
 }
@@ -269,11 +269,11 @@ void isColidePlayerToFeed(PlayerInfo& Client)
         }
     }
 }
+
 void CreateNewFeed()
 {
     for (int i = 0; i < MAXFEED; ++i)
     {
-        
         if (feed[i].Radius == 0)
         {
             feed[i].Radius = 3;
@@ -283,6 +283,7 @@ void CreateNewFeed()
         }
     }
 }
+
 void PlayerDevide(const Input& input)
 {
     if (Player[input.ClientNum].SellData[0].Radius >= 6.0f)
@@ -295,16 +296,20 @@ void PlayerDevide(const Input& input)
     }
 }
 
-void ColidePlayerToProjectile()
+void ColidePlayerToProjectile(int ClientNum)
 {
-    for (int i = 0; i < 3; ++i) {
-        for (int j = 0; j < MAXPROJ; ++j) {
+    for (int i = 0; i < 3; ++i) 
+    {
+        for (int j = 0; j < MAXPROJ; ++j) 
+        {
             if (projectiles[j].Color) {
-                for (int k = 0; k < 4; ++i) {
+                for (int k = 0; k < 4; ++k) 
+                {
                     if (Player[i].SellData[k].Radius) {
                         if (sqrt(pow(Player[i].SellData[k].Center.x - projectiles[j].Center.x, 2) + pow(Player[i].SellData[k].Center.y - projectiles[j].Center.y, 2)) < Player[i].SellData[k].Radius + 6) {
+                            cout << i << "번 클라와 충돌함" << endl;
                             if (Player[i].Color != projectiles[j].Color) Player[i].Score++;
-                            Player[i].SellData[k].Radius += 0.6;
+                            Player[i].SellData[k].Radius += 6.f;
                             projectiles[j].Color = 0;
                             break;
                         }
@@ -326,12 +331,13 @@ void SpitFeed(const Input& input)
                     float Distance = sqrtf(powf(xVec, 2) + powf(yVec, 2));
                     xVec /= Distance;
                     yVec /= Distance;
-                    projectiles[j].Center.x = Player[input.ClientNum].SellData[i].Center.x + Player[input.ClientNum].SellData[i].Radius + xVec * 8.f;
-                    projectiles[j].Center.y = Player[input.ClientNum].SellData[i].Center.y + Player[input.ClientNum].SellData[i].Radius + yVec * 8.f;
+                    projectiles[j].Center.x = Player[input.ClientNum].SellData[i].Center.x + xVec * 30.f;
+                    projectiles[j].Center.y = Player[input.ClientNum].SellData[i].Center.y + yVec * 30.f;
                     projectiles[j].Color = Player[input.ClientNum].Color;
                     projectiles[j].xSpeed = xVec;
                     projectiles[j].ySpeed = yVec;
                     Player[input.ClientNum].SellData[i].Radius -= 6;
+                    cout << input.ClientNum << "번 클라가 뱉음" << endl;
                     return;
                 }
             }
@@ -413,7 +419,7 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
             ProjectileMove();
             isColidePlayerToFeed(Player[temp.ClientNum]);
             isColidePlayerToPlayer(Player[temp.ClientNum], temp.ClientNum);
-            ColidePlayerToProjectile();
+            ColidePlayerToProjectile(temp.ClientNum);
         }
         
         SetEvent(ClientEvent[0]);
