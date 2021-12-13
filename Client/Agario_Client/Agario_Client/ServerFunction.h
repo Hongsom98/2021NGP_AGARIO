@@ -11,50 +11,41 @@ WSADATA wsa;
 SOCKET sock;
 SOCKADDR_IN serveraddr;
 bool isConnection{ false };
-enum USENICKNAME { NICK_YET, NICK_OK, NICK_NON };
-USENICKNAME nick = NICK_YET;
-#define SERVERIP "112.152.55.39"
-//#define SERVERIP "127.0.0.1"
 
-DWORD WINAPI RecvThread(LPVOID arg)
-{
-    int retval;
-    char type;
-    
+//#define SERVERIP "112.152.55.39"
+#define SERVERIP "127.0.0.1"
 
-    while (true)
-    {
-        retval = recvn(sock, (char*)&type, sizeof(type), 0);
-        if (retval == SOCKET_ERROR) {
-            err_quit("RecvThread recv()");
-            break;
-        }
-        
-        switch (type)
-        {
-
-        case NICKNAME_USE: {
-            nick = NICK_OK;
-            break;
-        }
-        case NICKNAME_UNUSE: {
-            nick = NICK_NON;
-            break;
-        }
-        case GAMEOBJECTLIST: {
-            GameObejctPacket packet;
-            recvn(sock, (char*)&packet, sizeof(packet), 0);
-            for (int i = 0; i < CLIENT; ++i) player[i].Update(packet.playerlist[i]);
-            feeds.Update(packet.feedlist, packet.projectile);
-            break;
-        }
-
-        }
-        
-    }
-    closesocket(sock);
-    return 0;
-}
+//DWORD WINAPI RecvThread(LPVOID arg)
+//{
+//    int retval;
+//    char type;
+//    
+//
+//    while (true)
+//    {
+//        retval = recvn(sock, (char*)&type, sizeof(type), 0);
+//        if (retval == SOCKET_ERROR) {
+//            Sleep(3000);
+//            // err_quit("RecvThread recv()");
+//            break;
+//        }
+//        
+//        switch (type)
+//        {
+//        case GAMEOBJECTLIST: {
+//            GameObejctPacket packet;
+//            recvn(sock, (char*)&packet, sizeof(packet), 0);
+//            for (int i = 0; i < CLIENT; ++i) player[i].Update(packet.playerlist[i]);
+//            feeds.Update(packet.feedlist, packet.projectile);
+//            break;
+//        }
+//
+//        }
+//        
+//    }
+//    closesocket(sock);
+//    return 0;
+//}
 
 void SendInputData(POINT p, char Key = 'N')
 {
@@ -113,6 +104,7 @@ bool RecvIDCheck()
 GameObejctPacket RecvObjects()
 {
     GameObejctPacket temp;
+    recvn(sock, (char*)&temp.type, sizeof(temp.type), 0);
 
     int retval = recvn(sock, (char*)&temp, sizeof(GameObejctPacket), 0);
     if (retval == SOCKET_ERROR) {

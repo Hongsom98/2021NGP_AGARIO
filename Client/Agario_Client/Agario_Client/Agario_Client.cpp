@@ -32,8 +32,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
     MSG msg;
     memset(&msg, 0, sizeof(msg));
-    HANDLE hThread;
-    hThread = CreateThread(NULL, 0, RecvThread, NULL, 0, NULL);
+   /* HANDLE hThread;
+    hThread = CreateThread(NULL, 0, RecvThread, NULL, 0, NULL);*/
 
     /*
     BOOL PerformFlg = FALSE;
@@ -160,12 +160,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (wParam == VK_RETURN) {
                 if (!isConnection) {
                     SendID(InputID);
-                    while (nick == NICK_YET);
-
-                    if (nick == NICK_OK) {
+                    if (RecvIDCheck()) {
                         isConnection = true; }
-                    else if(nick == NICK_NON) {
-                        nick = NICK_YET;
+                    else {
                         memset(InputID, 0, 12);
                         len = 0;
                     }
@@ -228,7 +225,9 @@ void Update()
         SendInputData(Mouse);
     }
 
-   
+    GameObejctPacket packet = RecvObjects();
+    for (int i = 0; i < CLIENT; ++i) player[i].Update(packet.playerlist[i]);
+    feeds.Update(packet.feedlist, packet.projectile);
 }
 
 void Render()
