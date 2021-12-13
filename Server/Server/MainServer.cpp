@@ -276,7 +276,19 @@ void isColidePlayerToFeed(PlayerInfo& Client)
         }
     }
 }
-
+void CheckPlayerDevide()
+{
+    for (int i = 0; i < 3; ++i)
+    {
+        if (Player[i].SellData[0].Radius < 1 && Player[i].SellData[1].Radius > 0)
+        {
+            cout << i << "¹ø ÇÃ·¹ÀÌ¾î 0À¸·Î ¹Ù²ãÁÜ" << endl;
+            Player[i].SellData[0].Radius += Player[i].SellData[1].Radius;
+            Player[i].SellData[0].Center = Player[i].SellData[1].Center;
+            Player[i].SellData[1].Radius = 0;
+        }
+    }
+}
 void CreateNewFeed()
 {
     for (int i = 0; i < MAXFEED; ++i)
@@ -293,7 +305,7 @@ void CreateNewFeed()
 
 void PlayerDevide(const Input& input)
 {
-    if (Player[input.ClientNum].SellData[0].Radius >= 10.0f)
+    if (Player[input.ClientNum].SellData[0].Radius >= 10.0f && Player[input.ClientNum].SellData[1].Radius == 0)
     {
         float Half_Radius = Player[input.ClientNum].SellData[0].Radius / 2;
         Player[input.ClientNum].SellData[0].Radius = Half_Radius;
@@ -514,6 +526,7 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
             isColidePlayerToFeed(Player[temp.ClientNum]);
             isColidePlayerToPlayer(Player[temp.ClientNum], temp.ClientNum);
             ColidePlayerToProjectile(temp.ClientNum);
+            CheckPlayerDevide();
         }
         
         SetEvent(ClientEvent[0]);
