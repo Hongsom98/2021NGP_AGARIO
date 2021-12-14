@@ -232,7 +232,7 @@ void CreateNewFeed()
 
 void PlayerDevide(const Input& input)
 {
-    if (Player[input.ClientNum].SellData[0].Radius >= 10.0f|| Player[input.ClientNum].SellData[1].Radius >= 10.0f)
+    if (Player[input.ClientNum].SellData[0].Radius >= 10.0f&& Player[input.ClientNum].SellData[1].Radius == 0)
     {
         float Half_Radius = Player[input.ClientNum].SellData[0].Radius / 2;
         Player[input.ClientNum].SellData[0].Radius = Half_Radius;
@@ -301,16 +301,16 @@ void devani(const Input& input)
         case 0:
             if (dev[0]) {
                 if (i < 25) {
-                    Player[0].SellData[0].Center.x -= 1.0f;
-                    Player[0].SellData[0].Center.y -= 1.0f;
-                    Player[0].SellData[1].Center.x += 1.0f;
-                    Player[0].SellData[1].Center.y += 1.0f;
+                    Player[0].SellData[0].Center.x -= 2.0f;
+                    Player[0].SellData[0].Center.y -= 2.0f;
+                    Player[0].SellData[1].Center.x += 2.0f;
+                    Player[0].SellData[1].Center.y += 2.0f;
                 }
                 if (i > 25) {
-                    Player[0].SellData[0].Center.x += 1.0f;
-                    Player[0].SellData[0].Center.y += 1.0f;
-                    Player[0].SellData[1].Center.x -= 1.0f;
-                    Player[0].SellData[1].Center.y -= 1.0f;
+                    Player[0].SellData[0].Center.x += 2.0f;
+                    Player[0].SellData[0].Center.y += 2.0f;
+                    Player[0].SellData[1].Center.x -= 2.0f;
+                    Player[0].SellData[1].Center.y -= 2.0f;
                 }
                 if (i == 50)
                 {
@@ -324,16 +324,16 @@ void devani(const Input& input)
         case 1:
             if (dev[1]) {
                 if (i < 25) {
-                    Player[1].SellData[0].Center.x -= 1.0f;
-                    Player[1].SellData[0].Center.y -= 1.0f;
-                    Player[1].SellData[1].Center.x += 1.0f;
-                    Player[1].SellData[1].Center.y += 1.0f;
+                    Player[1].SellData[0].Center.x -= 2.0f;
+                    Player[1].SellData[0].Center.y -= 2.0f;
+                    Player[1].SellData[1].Center.x += 2.0f;
+                    Player[1].SellData[1].Center.y += 2.0f;
                 }
                 if (i > 25) {
-                    Player[1].SellData[0].Center.x += 1.0f;
-                    Player[1].SellData[0].Center.y += 1.0f;
-                    Player[1].SellData[1].Center.x -= 1.0f;
-                    Player[1].SellData[1].Center.y -= 1.0f;
+                    Player[1].SellData[0].Center.x += 2.0f;
+                    Player[1].SellData[0].Center.y += 2.0f;
+                    Player[1].SellData[1].Center.x -= 2.0f;
+                    Player[1].SellData[1].Center.y -= 2.0f;
                 }
                 if (i == 50)
                 {
@@ -347,16 +347,16 @@ void devani(const Input& input)
         case 2:
             if (dev[2]) {
                 if (i < 25) {
-                    Player[2].SellData[0].Center.x -= 1.0f;
-                    Player[2].SellData[0].Center.y -= 1.0f;
-                    Player[2].SellData[1].Center.x += 1.0f;
-                    Player[2].SellData[1].Center.y += 1.0f;
+                    Player[2].SellData[0].Center.x -= 2.0f;
+                    Player[2].SellData[0].Center.y -= 2.0f;
+                    Player[2].SellData[1].Center.x += 2.0f;
+                    Player[2].SellData[1].Center.y += 2.0f;
                 }
                 if (i > 25) {
-                    Player[2].SellData[0].Center.x += 1.0f;
-                    Player[2].SellData[0].Center.y += 1.0f;
-                    Player[2].SellData[1].Center.x -= 1.0f;
-                    Player[2].SellData[1].Center.y -= 1.0f;
+                    Player[2].SellData[0].Center.x += 2.0f;
+                    Player[2].SellData[0].Center.y += 2.0f;
+                    Player[2].SellData[1].Center.x -= 2.0f;
+                    Player[2].SellData[1].Center.y -= 2.0f;
                 }
                 if (i == 50)
                 {
@@ -450,10 +450,10 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
             }
             ProjectileMove();
             isColidePlayerToFeed(Player[temp.ClientNum]);
-            isColidePlayerToPlayer();
             ColidePlayerToProjectile(temp.ClientNum);
-            CheckPlayerDevide();
         }
+        isColidePlayerToPlayer();
+        CheckPlayerDevide();
 
         SetEvent(ClientEvent[0]);
         tm.SetCurTime();
