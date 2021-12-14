@@ -22,6 +22,7 @@ std::uniform_int_distribution<> uidc(0, 255);
 BOOL devTimer = false;
 bool dev[3] = { false, false, false };
 int i = 0;
+bool GameOver{ false };
 
 void InitPlayers()
 {
@@ -453,7 +454,7 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
             ColidePlayerToProjectile(temp.ClientNum);
             CheckPlayerDevide();
         }
-        
+
         SetEvent(ClientEvent[0]);
         tm.SetCurTime();
         if (tm.GetDeltaTime() > 0.3f)

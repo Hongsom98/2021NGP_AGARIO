@@ -15,7 +15,8 @@ TCHAR InputID[12] = { 0 };
 HDC memDC;
 RECT ClientRect;
 HBITMAP hBitmap;
-char test[50];
+bool GameOver{ false };
+POINT LowRank;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow)
 {
@@ -32,8 +33,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
     MSG msg;
     memset(&msg, 0, sizeof(msg));
-   /* HANDLE hThread;
-    hThread = CreateThread(NULL, 0, RecvThread, NULL, 0, NULL);*/
 
     /*
     BOOL PerformFlg = FALSE;
@@ -167,6 +166,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         len = 0;
                     }
                 }
+                if (GameOver) {
+                    PostQuitMessage(0);
+                }
             }
             else if (wParam == VK_BACK) {
                 if (len == 0) break;
@@ -205,9 +207,19 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return (INT_PTR)FALSE;
 }
 
+void CheckGameOver()
+{
+    for (int i = 0; i < 3; ++i)
+        if (player[i].GetRadius() == 0 && player[(i + 1) % 3].GetRadius() == 0) {
+            GameOver = true;
+            LowRank.x = i; LowRank.y = (i + 1) % 3;
+            return;
+        }
+}
+
 void Update()
 {
-    if (!isConnection) return;
+    if (!isConnection || GameOver) return;
 
     GetCursorPos(&Mouse);
     ScreenToClient(hWnd, &Mouse);
@@ -228,6 +240,8 @@ void Update()
     GameObejctPacket packet = RecvObjects();
     for (int i = 0; i < CLIENT; ++i) player[i].Update(packet.playerlist[i]);
     feeds.Update(packet.feedlist, packet.projectile);
+
+    CheckGameOver();
 }
 
 void Render()
@@ -235,10 +249,34 @@ void Render()
     HDC hdc = GetDC(hWnd);
     PatBlt(memDC, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, WHITENESS);
 
-    if (isConnection) {
+    if (GameOver) {
+        TCHAR ranking[30];
+        memset(ranking, 0, 30);
+        TextOut(memDC, ClientRect.right / 2 - lstrlen("GAME OVER") / 2, ClientRect.bottom / 2 - 32, "GAME OVER", lstrlen("GAME OVER"));
+        wsprintf(ranking, "1위 : %s - %d점", player[3 - LowRank.x - LowRank.y].GetID(), player[3 - LowRank.x - LowRank.y].GetScore());
+        TextOut(memDC, ClientRect.right / 2 - lstrlen(ranking) / 2, ClientRect.bottom / 2 - 16, ranking, lstrlen(ranking));
+        memset(ranking, 0, 30);
+        if (player[LowRank.x].GetScore() > player[LowRank.y].GetScore()) {
+            wsprintf(ranking, "2위 : %s - %d점", player[LowRank.x].GetID(), player[LowRank.x].GetScore());
+            TextOut(memDC, ClientRect.right / 2 - lstrlen(ranking) / 2, ClientRect.bottom / 2, ranking, lstrlen(ranking));
+            memset(ranking, 0, 30);
+            wsprintf(ranking, "3위 : %s - %d점", player[LowRank.y].GetID(), player[LowRank.y].GetScore());
+            TextOut(memDC, ClientRect.right / 2 - lstrlen(ranking) / 2, ClientRect.bottom / 2 + 16, ranking, lstrlen(ranking));
+        }
+        else {
+            wsprintf(ranking, "2위 : %s - %d점", player[LowRank.y].GetID(), player[LowRank.y].GetScore());
+            TextOut(memDC, ClientRect.right / 2 - lstrlen(ranking) / 2, ClientRect.bottom / 2, ranking, lstrlen(ranking));
+            memset(ranking, 0, 30);
+            wsprintf(ranking, "3위 : %s - %d점", player[LowRank.x].GetID(), player[LowRank.x].GetScore());
+            TextOut(memDC, ClientRect.right / 2 - lstrlen(ranking) / 2, ClientRect.bottom / 2 + 16, ranking, lstrlen(ranking));
+        }
+
+        BitBlt(hdc, 0, 0, ClientRect.right, ClientRect.bottom, memDC, 0, 0, SRCCOPY);
+    }
+    else if (isConnection) {
         map.Draw(memDC);
         feeds.Draw(memDC);
-        for(int i = 0 ; i < CLIENT; ++i) player[i].Draw(memDC);
+        for (int i = 0; i < CLIENT; ++i) player[i].Draw(memDC);
 
         BitBlt(hdc, 0, 0, ClientRect.right, ClientRect.bottom, memDC, 0, 0, SRCCOPY);
     }
