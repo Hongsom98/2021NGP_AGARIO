@@ -3,8 +3,8 @@
 
 #define WINDOW_WIDTH	800
 #define WINDOW_HEIGHT	800
-#define MAXFEED			300
-#define MAXPROJ			50
+#define MAXFEED			200
+#define MAXPROJ			10
 
 struct Feed
 {

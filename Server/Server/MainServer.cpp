@@ -120,8 +120,8 @@ void ProjectileMove()
         if (projectiles[i].Color) {
             projectiles[i].Center.x += projectiles[i].xSpeed * 3.0f;
             projectiles[i].Center.y += projectiles[i].ySpeed * 3.0f;
-            projectiles[i].MoveDist += projectiles[i].xSpeed * 3.0f + projectiles[i].ySpeed * 3.0f;
-            if (projectiles[i].MoveDist >= 70.f) {
+            projectiles[i].MoveDist += abs(projectiles[i].xSpeed * 1.5f) + abs(projectiles[i].ySpeed * 1.5f);
+            if (projectiles[i].MoveDist >= 90.f) {
                 projectiles[i].xSpeed = 0;
                 projectiles[i].ySpeed = 0;
             }
@@ -384,7 +384,10 @@ DWORD WINAPI ProcessClient(LPVOID arg)
         WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
 
         retval = recvn(client_sock, (char*)&type, sizeof(type), 0);
-        if (retval == SOCKET_ERROR) err_display("Client Thread Type recv()");
+        if (retval == SOCKET_ERROR) {
+            err_display("Client Thread Type recv()");
+            break;
+        }
 
         switch (type) {
             case NICKNAME_ADD:
