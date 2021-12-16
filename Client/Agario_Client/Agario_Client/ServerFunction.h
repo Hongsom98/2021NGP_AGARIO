@@ -2,7 +2,6 @@
 #include "..\..\..\Server\Server\PacketDefine.h"
 #include "Player.h"
 #include "GameObject.h"
-#include <mutex>
 #pragma warning(disable : 4996)
 
 Player player[3];
@@ -12,8 +11,7 @@ SOCKET sock;
 SOCKADDR_IN serveraddr;
 bool isConnection{ false };
 
-//#define SERVERIP "112.152.55.39"
-#define SERVERIP "127.0.0.1"
+#define SERVERIP "112.152.55.39"
 
 void SendInputData(POINT p, char Key = 'N')
 {

@@ -23,9 +23,6 @@
     <ClInclude Include="framework.h">
       <Filter>소스 파일\UserDefine</Filter>
     </ClInclude>
-    <ClInclude Include="PacketDefine.h">
-      <Filter>소스 파일\UserDefine</Filter>
-    </ClInclude>
     <ClInclude Include="UserDefine.h">
       <Filter>소스 파일\UserDefine</Filter>
     </ClInclude>
