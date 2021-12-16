@@ -27,7 +27,7 @@ void SendInputData(POINT p, char Key = 'N')
     send(sock, (char*)&temp, sizeof(temp), 0);
 }
 
-void SendID(char* ID)
+void SendCanUseNickName(char* ID)
 {
 	int retval;
 
@@ -68,12 +68,12 @@ bool RecvIDCheck()
     return temp.type == NICKNAME_USE ? true : false;
 }
 
-GameObejctPacket RecvObjects()
+GameObjectPacket RecvObjects()
 {
-    GameObejctPacket temp;
+    GameObjectPacket temp;
     recvn(sock, (char*)&temp.type, sizeof(temp.type), 0);
 
-    int retval = recvn(sock, (char*)&temp, sizeof(GameObejctPacket), 0);
+    int retval = recvn(sock, (char*)&temp, sizeof(GameObjectPacket), 0);
     if (retval == SOCKET_ERROR) {
         err_display("recv()");
     }

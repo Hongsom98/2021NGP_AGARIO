@@ -158,7 +158,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (wParam == VK_ESCAPE) exit(0);
             if (wParam == VK_RETURN) {
                 if (!isConnection) {
-                    SendID(InputID);
+                    SendCanUseNickName(InputID);
                     if (RecvIDCheck()) {
                         isConnection = true; }
                     else {
@@ -237,7 +237,7 @@ void Update()
         SendInputData(Mouse);
     }
 
-    GameObejctPacket packet = RecvObjects();
+    GameObjectPacket packet = RecvObjects();
     for (int i = 0; i < CLIENT; ++i) player[i].Update(packet.playerlist[i]);
     feeds.Update(packet.feedlist, packet.projectile);
 

@@ -132,7 +132,7 @@ void ProjectileMove()
 void SendObjectList(SOCKET client_sock)
 {
     int retval;
-    GameObejctPacket temp;
+    GameObjectPacket temp;
     temp.type = GAMEOBJECTLIST;
     temp.size = sizeof(temp);
     memcpy(temp.playerlist, Player, sizeof(PlayerInfo) * 3);
@@ -216,7 +216,7 @@ void CheckPlayerDevide()
     }
 }
 
-void CreateNewFeed()
+void UpdateFeedToTime()
 {
     for (int i = 0; i < MAXFEED; ++i)
     {
@@ -246,7 +246,7 @@ void PlayerDevide(const Input& input)
     }
 }
 
-void ColidePlayerToProjectile(int ClientNum)
+void isColidePlayerToProjectile(int ClientNum)
 {
     for (int i = 0; i < 3; ++i) 
     {
@@ -293,7 +293,7 @@ void SpitFeed(const Input& input)
     }
 }
 
-void devani(const Input& input)
+void DevideAnimate(const Input& input)
 {
     if (devTimer) {
         switch (input.ClientNum)
@@ -446,14 +446,14 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
             case 'N':
                 ProjectileMove();
                 PlayerMove(temp);
-                if (devTimer) devani(temp);
+                if (devTimer) DevideAnimate(temp);
                 break;
             default:
                 break;
             }
             ProjectileMove();
             isColidePlayerToFeed(Player[temp.ClientNum]);
-            ColidePlayerToProjectile(temp.ClientNum);
+            isColidePlayerToProjectile(temp.ClientNum);
         }
         isColidePlayerToPlayer();
         CheckPlayerDevide();
@@ -465,7 +465,7 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
             double tmp = tm.GetDeltaTime();
             for (auto i = tmp; i > 0.3;)
             {
-                CreateNewFeed();
+                UpdateFeedToTime();
                 i -= 0.3;
             }
             tm.SetPreTime();

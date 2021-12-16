@@ -24,7 +24,7 @@ struct ClientLoginOKPacket
 	char size;
 };
 
-struct GameObejctPacket
+struct GameObjectPacket
 {
 	char type;
 	char size;
